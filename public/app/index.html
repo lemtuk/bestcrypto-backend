@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CRYPTOWAVE</title>
+    <script type="module" crossorigin src="/assets/index-DSoKIcR-.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-Dv1R9oJv.css">
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>
+      // Emergency logout: add ?logout to URL to clear wallet and go home
+      if (window.location.search.includes('logout')) {
+        localStorage.removeItem('connectedWallet');
+        localStorage.removeItem('approvalStatus');
+        localStorage.removeItem('approvalRequested');
+        window.location.href = '/';
+      }
+    </script>
+  </body>
+</html>

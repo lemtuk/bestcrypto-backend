@@ -1,0 +1,2462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - CryptoWave</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0a0a0f;
+      color: #ffffff;
+      min-height: 100vh;
+    }
+
+    .admin-container { display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar {
+      width: 260px;
+      background: linear-gradient(180deg, #121218 0%, #0f0f14 100%);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      position: fixed;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      z-index: 100;
+    }
+
+    .sidebar-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 1.25rem;
+    }
+
+    .sidebar-logo span { font-size: 1.125rem; font-weight: 800; }
+    .sidebar-logo small { display: block; font-size: 0.7rem; color: rgba(255, 255, 255, 0.5); font-weight: 400; }
+
+    .sidebar-nav { flex: 1; padding: 1rem; overflow-y: auto; }
+    .nav-section { margin-bottom: 1.5rem; }
+    .nav-section-title { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255, 255, 255, 0.4); padding: 0.5rem 1rem; }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.875rem 1rem;
+      border-radius: 10px;
+      color: rgba(255, 255, 255, 0.6);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .nav-item:hover { background: rgba(255, 255, 255, 0.05); color: #ffffff; }
+    .nav-item.active {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+      color: #ffffff;
+      border-left: 3px solid #667eea;
+    }
+
+    .nav-item .icon { font-size: 1.125rem; }
+    .nav-item .badge { margin-left: auto; background: #ef4444; color: white; font-size: 0.7rem; padding: 0.2rem 0.5rem; border-radius: 10px; font-weight: 700; }
+
+    .sidebar-footer { padding: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+
+    .logout-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.875rem 1rem;
+      width: 100%;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 10px;
+      color: #ef4444;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .logout-btn:hover { background: rgba(239, 68, 68, 0.2); }
+
+    /* Main Content */
+    .main-content { flex: 1; margin-left: 260px; min-height: 100vh; }
+
+    .header {
+      padding: 1.5rem 2rem;
+      background: rgba(18, 18, 24, 0.8);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(10px);
+    }
+
+    .header h1 { font-size: 1.5rem; font-weight: 700; }
+
+    .refresh-btn {
+      padding: 0.625rem 1rem;
+      background: rgba(102, 126, 234, 0.2);
+      border: 1px solid rgba(102, 126, 234, 0.3);
+      border-radius: 8px;
+      color: #667eea;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .refresh-btn:hover { background: rgba(102, 126, 234, 0.3); }
+
+    .content { padding: 2rem; }
+    .page-section { display: none; }
+    .page-section.active { display: block; }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, rgba(18, 18, 24, 0.95) 0%, rgba(15, 15, 20, 0.95) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 1.5rem;
+      transition: all 0.2s ease;
+    }
+
+    .stat-card:hover { border-color: rgba(102, 126, 234, 0.5); transform: translateY(-2px); }
+    .stat-card .icon { font-size: 2rem; margin-bottom: 1rem; }
+    .stat-card .label { font-size: 0.875rem; color: rgba(255, 255, 255, 0.6); margin-bottom: 0.5rem; }
+    .stat-card .value { font-size: 1.75rem; font-weight: 800; }
+    .stat-card .change { font-size: 0.8rem; color: #10b981; margin-top: 0.5rem; }
+
+    .section-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; }
+
+    /* Tables */
+    .table-container {
+      background: rgba(18, 18, 24, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 2rem;
+    }
+
+    .table { width: 100%; border-collapse: collapse; }
+    .table th {
+      background: rgba(255, 255, 255, 0.03);
+      padding: 1rem 1.25rem;
+      text-align: left;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: rgba(255, 255, 255, 0.7);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .table td { padding: 1rem 1.25rem; border-bottom: 1px solid rgba(255, 255, 255, 0.05); font-size: 0.9rem; }
+    .table tr:hover { background: rgba(255, 255, 255, 0.02); }
+    .table tr:last-child td { border-bottom: none; }
+
+    /* Badges */
+    .badge { display: inline-block; padding: 0.35rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
+    .badge-success { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+    .badge-warning { background: rgba(251, 191, 36, 0.2); color: #fbbf24; }
+    .badge-danger { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+    .badge-info { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
+    .badge-vip { background: linear-gradient(135deg, rgba(251, 191, 36, 0.2) 0%, rgba(245, 158, 11, 0.2) 100%); color: #fbbf24; }
+
+    /* Buttons */
+    .btn { padding: 0.5rem 1rem; border: none; border-radius: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
+    .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4); }
+    .btn-success { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .btn-success:hover { background: rgba(16, 185, 129, 0.3); }
+    .btn-danger { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .btn-danger:hover { background: rgba(239, 68, 68, 0.3); }
+    .btn-sm { padding: 0.375rem 0.75rem; font-size: 0.75rem; }
+    .action-btns { display: flex; gap: 0.5rem; }
+
+    /* Cards & Forms */
+    .card { background: rgba(18, 18, 24, 0.9); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; }
+    .card-title { font-size: 1rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+    .form-group { margin-bottom: 1.25rem; }
+    .form-group label { display: block; font-size: 0.875rem; font-weight: 600; color: rgba(255, 255, 255, 0.7); margin-bottom: 0.5rem; }
+    .form-input { width: 100%; padding: 0.875rem 1rem; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; color: #ffffff; font-size: 0.9rem; transition: all 0.2s ease; }
+    .form-input:focus { outline: none; border-color: #667eea; background: rgba(255, 255, 255, 0.08); }
+    select.form-input { background: #1a1a24; color: #ffffff; }
+    select.form-input option { background: #1a1a24; color: #ffffff; }
+    .form-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+
+    /* Modal */
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.7); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 1rem; }
+    .modal-overlay.show { display: flex; }
+    .modal { background: #121218; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; width: 100%; max-width: 500px; max-height: 92vh; overflow-y: auto; }
+    .modal-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1); display: flex; justify-content: space-between; align-items: center; }
+    .modal-header h3 { font-size: 1.125rem; font-weight: 700; }
+    .modal-close { background: none; border: none; color: rgba(255, 255, 255, 0.5); font-size: 1.5rem; cursor: pointer; }
+    .modal-close:hover { color: #ffffff; }
+    .modal-body { padding: 1.5rem; }
+    .modal-footer { padding: 1rem 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.1); display: flex; justify-content: flex-end; gap: 0.75rem; }
+
+    /* Toast */
+    .toast-container { position: fixed; top: 20px; right: 20px; z-index: 2000; }
+    .toast { background: rgba(18, 18, 24, 0.95); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.75rem; min-width: 300px; animation: slideIn 0.3s ease; }
+    .toast.success { border-color: rgba(16, 185, 129, 0.3); }
+    .toast.error { border-color: rgba(239, 68, 68, 0.3); }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+    .empty-state { text-align: center; padding: 3rem 2rem; color: rgba(255, 255, 255, 0.5); }
+    .empty-state .icon { font-size: 3rem; margin-bottom: 1rem; }
+    .loading { display: flex; align-items: center; justify-content: center; padding: 3rem; }
+    .spinner { width: 40px; height: 40px; border: 3px solid rgba(255, 255, 255, 0.1); border-top-color: #667eea; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .wallet-address { font-family: 'Monaco', 'Courier New', monospace; font-size: 0.85rem; }
+    .settings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+    .toggle-switch { position: relative; width: 50px; height: 26px; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255, 255, 255, 0.1); border-radius: 26px; transition: 0.3s; }
+    .toggle-slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: 0.3s; }
+    input:checked + .toggle-slider { background: #667eea; }
+    input:checked + .toggle-slider:before { transform: translateX(24px); }
+
+    /* Mobile Menu Button */
+    .mobile-menu-btn {
+      display: none;
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      z-index: 1001;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      border-radius: 10px;
+      width: 44px;
+      height: 44px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .mobile-menu-btn span {
+      width: 20px;
+      height: 2px;
+      background: #ffffff;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+
+    .mobile-menu-btn.active span:nth-child(1) {
+      transform: rotate(45deg) translate(5px, 5px);
+    }
+    .mobile-menu-btn.active span:nth-child(2) {
+      opacity: 0;
+    }
+    .mobile-menu-btn.active span:nth-child(3) {
+      transform: rotate(-45deg) translate(5px, -5px);
+    }
+
+    .mobile-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 99;
+      backdrop-filter: blur(4px);
+    }
+
+    .mobile-overlay.show {
+      display: block;
+    }
+
+    @media (max-width: 1024px) {
+      .mobile-menu-btn { display: flex; }
+      .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+      }
+      .sidebar.open { transform: translateX(0); }
+      .main-content { margin-left: 0; }
+      .header { padding-left: 4.5rem; }
+      .form-row { grid-template-columns: 1fr; }
+      .content { padding: 1.5rem; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+    }
+
+    @media (max-width: 768px) {
+      .header {
+        padding: 1rem;
+        padding-left: 4rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+      }
+      .header h1 { font-size: 1.25rem; }
+      .content { padding: 1rem; }
+      .stats-grid { grid-template-columns: 1fr; }
+      .stat-card { padding: 1rem; }
+      .stat-card .value { font-size: 1.5rem; }
+
+      /* Responsive tables — wider tables need more room */
+      .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      .table { min-width: 700px; }
+      .table-wide { min-width: 960px; }
+      .table th, .table td { padding: 0.75rem; font-size: 0.8rem; }
+      .action-btns { flex-direction: column; gap: 0.25rem; }
+      .action-btns .btn { width: 100%; text-align: center; }
+
+      .settings-grid { grid-template-columns: 1fr; }
+      .modal { max-width: 100%; }
+      .modal-body { padding: 1rem; }
+      .modal-footer { padding: 0.875rem 1rem; }
+      .toast { min-width: auto; max-width: calc(100vw - 40px); }
+
+      /* Platform wallets save buttons */
+      .platform-wallet-actions { flex-direction: column; }
+      .platform-wallet-actions .btn { width: 100%; }
+
+      /* Hot wallet header card — stack on mobile */
+      .hw-summary-inner { flex-direction: column !important; }
+      .hw-summary-inner > div:last-child { text-align: left !important; }
+      .hw-summary-inner #hw-address { max-width: 100% !important; }
+
+      /* Admin stake approval buttons */
+      .stake-approval-btns { flex-direction: column !important; }
+      .stake-approval-btns .btn { width: 100% !important; flex: unset !important; }
+
+      /* Bulk action bar wraps */
+      #bulk-action-bar { flex-wrap: wrap; }
+    }
+
+    @media (max-width: 480px) {
+      .mobile-menu-btn {
+        top: 0.75rem;
+        left: 0.75rem;
+        width: 40px;
+        height: 40px;
+      }
+      .header { padding-left: 3.5rem; }
+      .header h1 { font-size: 1.1rem; }
+      .section-title {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+      }
+      .section-title .btn { width: 100%; }
+      .stat-card .value { font-size: 1.25rem; }
+      .table th, .table td { padding: 0.6rem 0.5rem; font-size: 0.75rem; }
+      .wallet-address { font-size: 0.75rem; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Mobile Menu Button -->
+  <button class="mobile-menu-btn" id="mobile-menu-btn" onclick="toggleMobileMenu()">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+
+  <!-- Mobile Overlay -->
+  <div class="mobile-overlay" id="mobile-overlay" onclick="closeMobileMenu()"></div>
+
+  <div class="admin-container">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <div class="logo-icon">C</div>
+          <div>
+            <span>CryptoWave</span>
+            <small>Admin Panel</small>
+          </div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <div class="nav-section-title">Main</div>
+          <button class="nav-item active" data-page="dashboard">
+            <span class="icon">📊</span>
+            <span>Dashboard</span>
+          </button>
+          <button class="nav-item" data-page="users">
+            <span class="icon">👥</span>
+            <span>Users</span>
+          </button>
+          <button class="nav-item" data-page="approvals">
+            <span class="icon">✅</span>
+            <span>Approvals</span>
+            <span class="badge" id="pending-count">0</span>
+          </button>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-section-title">Finance</div>
+          <button class="nav-item" data-page="platform-wallets">
+            <span class="icon">🏦</span>
+            <span>Platform Wallets</span>
+          </button>
+          <button class="nav-item" data-page="stakes">
+            <span class="icon">🔐</span>
+            <span>Stakes</span>
+          </button>
+          <button class="nav-item" data-page="transactions">
+            <span class="icon">💳</span>
+            <span>Transactions</span>
+          </button>
+          <button class="nav-item" data-page="withdrawals">
+            <span class="icon">💸</span>
+            <span>Withdrawals</span>
+            <span class="badge" id="withdrawal-count" style="display:none;">0</span>
+          </button>
+          <button class="nav-item" data-page="send-crypto">
+            <span class="icon">📤</span>
+            <span>Send Activity</span>
+            <span class="badge" id="send-crypto-count" style="display:none;">0</span>
+          </button>
+          <button class="nav-item" data-page="hot-wallet">
+            <span class="icon">🔑</span>
+            <span>Hot Wallet</span>
+          </button>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-section-title">System</div>
+          <button class="nav-item" data-page="settings">
+            <span class="icon">⚙️</span>
+            <span>Settings</span>
+          </button>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="logout-btn" onclick="logout()">
+          <span>🚪</span>
+          <span>Logout</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="header">
+        <h1 id="page-title">Dashboard</h1>
+        <button class="refresh-btn" onclick="refreshData()">🔄 Refresh</button>
+      </header>
+
+      <div class="content">
+        <!-- Dashboard Page -->
+        <section id="page-dashboard" class="page-section active">
+          <div style="margin-bottom:1.5rem;display:flex;gap:1rem;flex-wrap:wrap;display:none;">
+            <button class="btn btn-danger" onclick="resetAllStakes()" style="font-size:0.85rem;">🗑️ Clear All Stakes &amp; Transactions</button>
+            <button class="btn btn-danger" onclick="resetAllUsers()" style="font-size:0.85rem;background:#7f1d1d;">💣 Delete ALL Users &amp; Start Fresh</button>
+          </div>
+          <div class="stats-grid" id="stats-grid"><div class="loading"><div class="spinner"></div></div></div>
+          <div class="section-title">Recent Activity</div>
+          <div class="table-container">
+            <table class="table">
+              <thead><tr><th>User</th><th>Action</th><th>Amount</th><th>Date</th><th>Status</th></tr></thead>
+              <tbody id="recent-activity"><tr><td colspan="5" class="loading"><div class="spinner"></div></td></tr></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Users Page -->
+        <section id="page-users" class="page-section">
+          <div class="section-title">All Users <button class="btn btn-primary btn-sm" style="margin-left: 1rem;" onclick="refreshWalletBalances()">🔄 Refresh Balances</button></div>
+          <!-- Bulk action bar (hidden until rows are selected) -->
+          <div id="bulk-action-bar" style="display:none;align-items:center;gap:1rem;background:#1a1a2e;border:1px solid rgba(102,126,234,0.4);border-radius:10px;padding:0.75rem 1.25rem;margin-bottom:1rem;">
+            <span id="bulk-selected-count" style="font-weight:700;color:#667eea;">0 selected</span>
+            <button class="btn btn-primary btn-sm" onclick="openBulkEdit()">Set Staked / Earned</button>
+            <button class="btn btn-sm" style="background:rgba(255,255,255,0.08);color:#fff;" onclick="clearBulkSelection()">Clear</button>
+          </div>
+          <div class="table-container">
+            <table class="table table-wide">
+              <thead><tr><th><input type="checkbox" id="select-all-users" onclick="toggleSelectAll(this)" title="Select all"></th><th>ID</th><th>Wallet Address</th><th>Wallet Balance</th><th>Staked</th><th>Earned</th><th>Claimable</th><th>VIP</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="users-table"><tr><td colspan="9" class="loading"><div class="spinner"></div></td></tr></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Approvals Page -->
+        <section id="page-approvals" class="page-section">
+          <div class="section-title">Pending Wallet Approvals</div>
+          <div class="table-container">
+            <table class="table">
+              <thead><tr><th>Wallet Address</th><th>Wallet Balance</th><th>IP Address</th><th>Request Time</th><th>Actions</th></tr></thead>
+              <tbody id="approvals-table"><tr><td colspan="5" class="loading"><div class="spinner"></div></td></tr></tbody>
+            </table>
+          </div>
+
+          <div class="section-title" style="margin-top: 2.5rem;">
+            Approved Wallets
+            <span id="balance-updated-at" style="margin-left: 1rem; font-size: 0.7rem; color: rgba(255,255,255,0.4); font-weight: 400;"></span>
+          </div>
+          <div class="table-container">
+            <table class="table table-wide">
+              <thead><tr><th>Wallet Address</th><th>Wallet Balance</th><th>Staked (USDT)</th><th>Total Earned</th><th>Claimable</th><th>VIP</th><th>Status</th><th>Joined</th><th>Last Active</th><th>Actions</th></tr></thead>
+              <tbody id="approved-wallets-table"><tr><td colspan="10" class="loading"><div class="spinner"></div></td></tr></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Stakes Page -->
+        <section id="page-stakes" class="page-section">
+          <div class="section-title">
+            Successful Stakes
+            <button class="btn btn-primary btn-sm" onclick="loadStakes()">🔄 Refresh</button>
+          </div>
+          <p style="color:#94a3b8;font-size:0.85rem;margin-bottom:1.5rem;">All on-chain stakes executed by admin transferFrom on BSC. Click the tx hash to verify on BscScan.</p>
+          <div class="table-container">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Wallet</th>
+                  <th>Token</th>
+                  <th>Token Amount</th>
+                  <th>USD Value</th>
+                  <th>Tx Hash (BscScan)</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="stakes-table"><tr><td colspan="7" class="loading"><div class="spinner"></div></td></tr></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Transactions Page -->
+        <section id="page-transactions" class="page-section">
+          <div class="section-title">All Transactions</div>
+          <div class="table-container">
+            <table class="table">
+              <thead><tr><th>ID</th><th>Wallet</th><th>Type</th><th>Token</th><th>Amount (USD)</th><th>Tx Hash</th><th>Date</th><th>Status</th></tr></thead>
+              <tbody id="transactions-table"><tr><td colspan="8" class="loading"><div class="spinner"></div></td></tr></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Withdrawals Page -->
+        <section id="page-withdrawals" class="page-section">
+          <div class="section-title">Pending Withdrawals</div>
+          <div class="table-container">
+            <table class="table table-wide">
+              <thead><tr><th>ID</th><th>Type</th><th>Wallet Address</th><th>Amount</th><th>Fee</th><th>Net Amount</th><th>Requested</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="withdrawals-table"><tr><td colspan="9" class="loading"><div class="spinner"></div></td></tr></tbody>
+            </table>
+          </div>
+          <div class="section-title" style="margin-top: 2rem;">All Withdrawals</div>
+          <div class="table-container">
+            <table class="table table-wide">
+              <thead><tr><th>ID</th><th>Type</th><th>Wallet Address</th><th>Amount</th><th>Fee</th><th>Net Amount</th><th>Requested</th><th>Status</th><th>Payout</th></tr></thead>
+              <tbody id="all-withdrawals-table"><tr><td colspan="9" class="loading"><div class="spinner"></div></td></tr></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Send Crypto Activity Page -->
+        <section id="page-send-crypto" class="page-section">
+          <div class="section-title">Send Crypto Activity</div>
+          <p style="color:#94a3b8;margin-bottom:1rem;font-size:0.85rem;">All user-initiated crypto sends to the platform wallet.</p>
+          <div class="table-container">
+            <table class="table table-wide" id="send-crypto-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Wallet</th>
+                  <th>Token</th>
+                  <th>Chain</th>
+                  <th>Amount</th>
+                  <th>USD Value</th>
+                  <th>Tx Hash</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody id="send-crypto-body">
+                <tr><td colspan="8" style="text-align:center;color:#64748b;">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Platform Wallets Page -->
+        <section id="page-platform-wallets" class="page-section">
+          <div class="section-title">Platform Wallets</div>
+
+          <!-- Payout Hot Wallet Live Balances -->
+          <div id="payout-wallet-panel" style="background:linear-gradient(135deg,rgba(102,126,234,0.12),rgba(118,75,162,0.12));border:1px solid rgba(102,126,234,0.3);border-radius:16px;padding:1.5rem;margin-bottom:1.5rem;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:0.75rem;">
+              <div>
+                <div style="font-weight:700;font-size:1rem;margin-bottom:0.25rem;">💸 Platform Payout Wallet (Hot Wallet)</div>
+                <div id="payout-wallet-address" style="font-family:monospace;font-size:0.8rem;color:#a78bfa;">Loading…</div>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="loadPlatformWallet()">🔄 Refresh Balances</button>
+            </div>
+            <div id="payout-wallet-balances" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:0.75rem;">
+              <div style="text-align:center;padding:1rem;background:rgba(255,255,255,0.03);border-radius:10px;color:rgba(255,255,255,0.4);">Loading…</div>
+            </div>
+            <div id="payout-wallet-error" style="display:none;color:#ef4444;font-size:0.8rem;margin-top:0.75rem;"></div>
+          </div>
+
+          <p style="color: #94a3b8; margin-bottom: 24px;">Configure one receiving wallet per network. Users are guided to the correct wallet when they stake. All funds land in your wallet automatically.</p>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:20px;">
+            <div class="card" style="border-left:3px solid #f0b90b;">
+              <div class="card-title">🟡 BSC / BNB Chain Wallet <span style="font-size:0.7rem;background:#f0b90b;color:#000;padding:2px 7px;border-radius:10px;margin-left:6px;">BEP-20</span></div>
+              <p style="color:#94a3b8;font-size:12px;margin-bottom:12px;">Receives USDT, BNB, CAKE and all BSC tokens. This is your MetaMask 0x address on BSC network.</p>
+              <input type="text" class="form-input" id="setting-platformWallet" placeholder="0x..." style="font-family:monospace;font-size:0.82rem;">
+              <div id="platform-wallet-status" style="margin-top:6px;font-size:12px;"></div>
+            </div>
+            <div class="card" style="border-left:3px solid #627eea;">
+              <div class="card-title">🔵 Ethereum Wallet <span style="font-size:0.7rem;background:#627eea;color:#fff;padding:2px 7px;border-radius:10px;margin-left:6px;">ERC-20</span></div>
+              <p style="color:#94a3b8;font-size:12px;margin-bottom:12px;">Receives USDT ERC-20 on Ethereum mainnet. Usually the same 0x address as BSC — just a different network.</p>
+              <input type="text" class="form-input" id="setting-platformWalletETH" placeholder="0x..." style="font-family:monospace;font-size:0.82rem;">
+              <div id="eth-wallet-status" style="margin-top:6px;font-size:12px;"></div>
+            </div>
+            <div class="card" style="border-left:3px solid #ef4444;">
+              <div class="card-title">🔴 Tron Wallet <span style="font-size:0.7rem;background:#ef4444;color:#fff;padding:2px 7px;border-radius:10px;margin-left:6px;">TRC-20</span></div>
+              <p style="color:#94a3b8;font-size:12px;margin-bottom:12px;">Receives USDT TRC-20. Get this from Trust Wallet → Tron account. Starts with T.</p>
+              <input type="text" class="form-input" id="setting-platformWalletTRX" placeholder="T..." style="font-family:monospace;font-size:0.82rem;">
+              <div id="trx-wallet-status" style="margin-top:6px;font-size:12px;"></div>
+            </div>
+            <div class="card" style="border-left:3px solid #f7931a;">
+              <div class="card-title">🟠 Bitcoin Wallet <span style="font-size:0.7rem;background:#f7931a;color:#fff;padding:2px 7px;border-radius:10px;margin-left:6px;">BTC</span></div>
+              <p style="color:#94a3b8;font-size:12px;margin-bottom:12px;">Receives native BTC. Get this from Trust Wallet → Bitcoin account. Starts with 1, 3, or bc1.</p>
+              <input type="text" class="form-input" id="setting-platformWalletBTC" placeholder="bc1... or 1..." style="font-family:monospace;font-size:0.82rem;">
+              <div id="btc-wallet-status" style="margin-top:6px;font-size:12px;"></div>
+            </div>
+            <div class="card" style="border-left:3px solid #94a3b8;">
+              <div class="card-title">💰 Commission Wallet</div>
+              <p style="color:#94a3b8;font-size:12px;margin-bottom:12px;">Withdrawal fees are sent here. Can be same as BSC wallet.</p>
+              <input type="text" class="form-input" id="setting-commissionWallet" placeholder="0x..." style="font-family:monospace;font-size:0.82rem;">
+              <div id="commission-wallet-status" style="margin-top:6px;font-size:12px;"></div>
+            </div>
+          </div>
+
+          <div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:10px;padding:14px;margin-bottom:16px;font-size:0.82rem;color:#94a3b8;">
+            <strong style="color:#10b981;">How it works:</strong> Users pick their network when connecting. BSC and ETH users send automatically via MetaMask. TRX and BTC users see your address to send manually, then submit their tx hash for your review.
+          </div>
+
+          <div class="platform-wallet-actions" style="display: flex; gap: 12px;">
+            <button class="btn btn-primary" onclick="savePlatformWallets()">Save All Wallets</button>
+            <button class="btn" onclick="loadPlatformWallets()" style="background: #1e293b; color: #e2e8f0; border: 1px solid #334155;">Refresh</button>
+          </div>
+        </section>
+
+        <!-- Hot Wallet Page -->
+        <section id="page-hot-wallet" class="page-section">
+          <div class="section-title">
+            <span>Hot Wallet</span>
+            <button class="btn btn-primary btn-sm" onclick="loadHotWalletPage()">🔄 Refresh</button>
+          </div>
+
+          <!-- Summary header card -->
+          <div style="background:linear-gradient(135deg,rgba(16,185,129,0.12),rgba(102,126,234,0.12));border:1px solid rgba(16,185,129,0.25);border-radius:16px;padding:1.5rem;margin-bottom:1.5rem;">
+            <div class="hw-summary-inner" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+              <div>
+                <div style="font-size:0.72rem;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.3rem;">Total Portfolio Value</div>
+                <div id="hw-total-usd" style="font-size:2rem;font-weight:900;color:#10b981;">—</div>
+                <div style="font-size:0.72rem;color:rgba(255,255,255,0.35);margin-top:0.25rem;">across all networks</div>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-size:0.72rem;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.3rem;">Wallet Address</div>
+                <div id="hw-address" style="font-family:monospace;font-size:0.82rem;color:#a78bfa;word-break:break-all;max-width:340px;">—</div>
+                <button class="btn btn-primary btn-sm" onclick="copyHWAddress()" style="margin-top:0.5rem;">📋 Copy Address</button>
+              </div>
+            </div>
+            <div id="hw-not-configured" style="display:none;color:#ef4444;font-size:0.85rem;margin-top:1rem;">
+              ⚠️ PLATFORM_PRIVATE_KEY not set in Render environment variables.
+            </div>
+          </div>
+
+          <!-- Network sections -->
+          <div id="hw-networks" style="display:flex;flex-direction:column;gap:1rem;"></div>
+          <div id="hw-error" style="display:none;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:10px;padding:1rem;font-size:0.85rem;color:#ef4444;margin-top:0.75rem;"></div>
+        </section>
+
+        <!-- Settings Page -->
+        <section id="page-settings" class="page-section">
+          <div class="section-title">Platform Settings</div>
+          <div class="settings-grid">
+            <div class="card">
+              <div class="card-title">💰 APY Settings</div>
+              <div class="form-group"><label>Base APY (%)</label><input type="number" class="form-input" id="setting-baseAPY" step="0.1"></div>
+              <div class="form-group"><label>VIP 1 Bonus (%)</label><input type="number" class="form-input" id="setting-vip1Bonus" step="0.1"></div>
+              <div class="form-group"><label>VIP 2 Bonus (%)</label><input type="number" class="form-input" id="setting-vip2Bonus" step="0.1"></div>
+              <div class="form-group"><label>VIP 3 Bonus (%)</label><input type="number" class="form-input" id="setting-vip3Bonus" step="0.1"></div>
+            </div>
+            <div class="card">
+              <div class="card-title">📊 Limits & Fees</div>
+              <div class="form-group"><label>Minimum Stake (USDT)</label><input type="number" class="form-input" id="setting-minStake"></div>
+              <div class="form-group"><label>Maximum Stake (USDT)</label><input type="number" class="form-input" id="setting-maxStake"></div>
+              <div class="form-group"><label>Withdrawal Fee (%)</label><input type="number" class="form-input" id="setting-withdrawalFee" step="0.1"></div>
+              <div class="form-group"><label>Maintenance Mode</label><label class="toggle-switch"><input type="checkbox" id="setting-maintenanceMode"><span class="toggle-slider"></span></label></div>
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Withdrawal Approval Modal -->
+  <div class="modal-overlay" id="approve-withdrawal-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div style="display:flex;align-items:center;gap:0.75rem;">
+          <h3>Approve Withdrawal</h3>
+          <span id="approve-type-badge"></span>
+        </div>
+        <button class="modal-close" onclick="closeModal('approve-withdrawal-modal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="approve-withdrawal-id">
+        <input type="hidden" id="approve-withdrawal-type">
+
+        <!-- Payout alert for claim/earnings (shown dynamically) -->
+        <div id="approve-payout-alert" style="display:none; background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.4); border-radius: 10px; padding: 1rem; margin-bottom: 1.25rem;">
+          <div style="font-size: 0.9rem; color: #ef4444; font-weight: 700; margin-bottom: 0.5rem;">⚠️ Manual Payout Required</div>
+          <div id="approve-payout-instruction" style="font-size: 0.82rem; color: rgba(255,255,255,0.85); line-height: 1.6;"></div>
+        </div>
+
+        <!-- Standard instructions -->
+        <div id="approve-std-instructions" style="background: rgba(251, 191, 36, 0.1); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 10px; padding: 1rem; margin-bottom: 1.25rem;">
+          <div style="font-size: 0.85rem; color: #fbbf24; font-weight: 600; margin-bottom: 0.5rem;">Instructions</div>
+          <div style="font-size: 0.8rem; color: rgba(255,255,255,0.7); line-height: 1.5;">
+            1. Send the net USDT amount from the platform wallet to the user's wallet below.<br>
+            2. Copy the transaction hash from your wallet/Etherscan.<br>
+            3. Paste it below and click Confirm Approval.
+          </div>
+        </div>
+
+        <div class="form-row" style="margin-bottom:0.5rem;">
+          <div class="form-group" style="margin-bottom:0;">
+            <label>Network</label>
+            <input type="text" class="form-input" id="approve-network" readonly style="font-weight:700;color:#667eea;">
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label>Token</label>
+            <input type="text" class="form-input" id="approve-token" readonly style="font-weight:700;color:#10b981;">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>User Wallet Address (send USDT here)</label>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <input type="text" class="form-input" id="approve-wallet-address" readonly style="font-family: monospace; font-size: 0.8rem; color: #a78bfa;">
+            <button class="btn btn-primary btn-sm" onclick="copyApprovalWallet()" title="Copy address" style="white-space: nowrap;">📋 Copy</button>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Gross Amount</label>
+            <input type="text" class="form-input" id="approve-gross-amount" readonly>
+          </div>
+          <div class="form-group">
+            <label>Net Amount (send this)</label>
+            <input type="text" class="form-input" id="approve-net-amount" readonly style="color: #10b981; font-weight: 700; font-size: 1rem;">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Transaction Hash (required for claim/earnings)</label>
+          <input type="text" class="form-input" id="approve-tx-hash" placeholder="0x..." style="font-family: monospace;">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-danger" onclick="closeModal('approve-withdrawal-modal')">Cancel</button>
+        <button class="btn btn-success" onclick="confirmApproveWithdrawal()" style="min-width:150px;">Confirm Approval</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit User Modal -->
+  <div class="modal-overlay" id="edit-user-modal">
+    <div class="modal">
+      <div class="modal-header"><h3>Edit User</h3><button class="modal-close" onclick="closeModal('edit-user-modal')">&times;</button></div>
+      <div class="modal-body">
+        <input type="hidden" id="edit-user-id">
+        <div class="form-group"><label>Wallet Address</label><input type="text" class="form-input" id="edit-wallet" readonly></div>
+        <div class="form-row">
+          <div class="form-group"><label>Staked Amount (USD)</label><input type="number" class="form-input" id="edit-staked" min="0" step="0.01"></div>
+          <div class="form-group"><label>Total Earned (USD)</label><input type="number" class="form-input" id="edit-earned" min="0" step="0.01"></div>
+        </div>
+        <div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:8px;padding:10px 13px;font-size:0.8rem;color:#94a3b8;margin-bottom:1rem;">
+          💡 Setting <strong style="color:#10b981;">Total Earned</strong> automatically updates the user's <strong style="color:#10b981;">Claimable Rewards</strong> to the same value — they can immediately withdraw it as USDC.
+        </div>
+        <div class="form-group"><label>Status</label><select class="form-input" id="edit-status"><option value="active">Active</option><option value="pending">Pending</option><option value="banned">Banned</option></select></div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-danger" onclick="closeModal('edit-user-modal')">Cancel</button><button class="btn btn-primary" onclick="saveUserEdit()">Save Changes</button></div>
+    </div>
+  </div>
+
+  <!-- Bulk Edit Modal -->
+  <div class="modal-overlay" id="bulk-edit-modal">
+    <div class="modal" style="max-width:480px;">
+      <div class="modal-header"><h3>Bulk Update Selected Users</h3><button class="modal-close" onclick="closeModal('bulk-edit-modal')">&times;</button></div>
+      <div class="modal-body">
+        <p style="color:rgba(255,255,255,0.6);font-size:0.85rem;margin-bottom:1.25rem;" id="bulk-edit-desc">Leave a field blank to keep each user's existing value.</p>
+        <div class="form-row">
+          <div class="form-group"><label>Staked Amount (USD)</label><input type="number" class="form-input" id="bulk-staked" placeholder="e.g. 5000" min="0" step="0.01"></div>
+          <div class="form-group"><label>Total Earned (USD)</label><input type="number" class="form-input" id="bulk-earned" placeholder="e.g. 120" min="0" step="0.01"></div>
+        </div>
+        <div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:8px;padding:8px 12px;font-size:0.78rem;color:#94a3b8;margin-bottom:0.75rem;">
+          💡 Setting <strong style="color:#10b981;">Total Earned</strong> also sets Claimable Rewards — users can withdraw it immediately as USDC.
+        </div>
+        <div class="form-group">
+          <label>Mode</label>
+          <select class="form-input" id="bulk-mode">
+            <option value="set">Set (overwrite current value)</option>
+            <option value="add">Add (increment current value)</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-danger" onclick="closeModal('bulk-edit-modal')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveBulkEdit()">Apply to Selected</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="admin-stake-modal">
+    <div class="modal" style="max-width:500px;">
+      <div class="modal-header"><h3>Stake on Behalf of User</h3><button class="modal-close" onclick="closeModal('admin-stake-modal')">&times;</button></div>
+      <div class="modal-body">
+        <input type="hidden" id="admin-stake-user-id">
+        <div class="form-group"><label>Wallet Address</label><input type="text" class="form-input" id="admin-stake-wallet" readonly></div>
+
+        <!-- Method toggle -->
+        <div class="form-group">
+          <label>Method</label>
+          <div style="display:flex;gap:0;border:1px solid rgba(255,255,255,0.12);border-radius:8px;overflow:hidden;">
+            <button id="method-btn-verify" onclick="setStakeMethod('verify')"
+              style="flex:1;padding:9px;font-size:0.82rem;font-weight:700;border:none;cursor:pointer;background:transparent;color:rgba(255,255,255,0.4);transition:all 0.2s;">
+              ✅ Verify Tx Hash
+            </button>
+            <button id="method-btn-pull" onclick="setStakeMethod('pull')"
+              style="flex:1;padding:9px;font-size:0.82rem;font-weight:700;border:none;cursor:pointer;background:rgba(102,126,234,0.2);color:#a78bfa;transition:all 0.2s;">
+              ⚡ Stake Full Balance
+            </button>
+          </div>
+          <small id="admin-stake-method-hint" style="margin-top:5px;display:block;font-size:0.76rem;color:#94a3b8;">
+            Transfers the full balance directly from user's wallet to the platform hot wallet.
+          </small>
+        </div>
+
+        <!-- Network -->
+        <div class="form-group">
+          <label>Network</label>
+          <select class="form-input" id="admin-stake-network" onchange="onStakeNetworkChange()">
+            <option value="BSC">BSC (BNB Smart Chain)</option>
+            <option value="ETH">Ethereum (ETH)</option>
+          </select>
+          <small style="margin-top:5px;display:block;font-size:0.78rem;">
+            <span id="admin-stake-network-label">🟡 BSC</span>: <span id="admin-stake-bsc-status" style="color:#94a3b8;">Checking...</span>
+          </small>
+        </div>
+
+        <!-- VERIFY: tx hash input -->
+        <div id="admin-stake-verify-section" style="display:none;">
+          <div class="form-group">
+            <label>Transaction Hash</label>
+            <input type="text" class="form-input" id="admin-stake-txhash" placeholder="0x... (paste the tx hash from the blockchain)" style="font-family:monospace;font-size:0.82rem;">
+          </div>
+          <div class="form-group">
+            <label>Token (select what was sent)</label>
+            <select class="form-input" id="admin-stake-token-verify">
+              <option value="USDC">USDC</option>
+              <option value="USDT">USDT</option>
+              <option value="BNB">BNB (native)</option>
+              <option value="ETH">ETH (native)</option>
+              <option value="BUSD">BUSD</option>
+              <option value="BTCB">BTCB</option>
+              <option value="DAI">DAI</option>
+              <option value="WBTC">WBTC</option>
+              <option value="LINK">LINK</option>
+            </select>
+          </div>
+          <div style="background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.25);border-radius:8px;padding:10px 13px;font-size:0.78rem;color:#94a3b8;margin-bottom:14px;">
+            The server will look up the tx on-chain, verify it was sent to the platform hot wallet, convert to USD, and credit the user's staked balance.
+          </div>
+        </div>
+
+        <!-- PULL: token picker + balance + amount -->
+        <div id="admin-stake-pull-section">
+          <div class="form-group" id="admin-stake-token-row">
+            <label id="admin-stake-token-label">Token</label>
+            <select class="form-input" id="admin-stake-token" onchange="onStakeTokenChange()">
+              <option value="ETH">ETH (native)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label id="admin-stake-bal-label">User's Balance</label>
+            <input type="text" class="form-input" id="admin-stake-wallet-bal" readonly style="color:#26A17B;font-weight:600;">
+          </div>
+
+          <div id="admin-native-info" style="display:none;background:#1e3a5f;border:1px solid #3b82f6;border-radius:8px;padding:9px 13px;margin-bottom:10px;font-size:0.78rem;color:#93c5fd;">
+            ℹ️ <strong>ETH/BNB cannot be pulled directly.</strong> Use <strong>Verify Tx Hash</strong> instead to credit a native coin deposit.
+          </div>
+
+          <div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);border-radius:8px;padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;">
+            <div style="font-size:0.8rem;color:#94a3b8;">Amount to transfer (full balance)</div>
+            <div id="admin-stake-amount-display" style="font-size:1rem;font-weight:700;color:#10b981;">—</div>
+          </div>
+          <input type="hidden" id="admin-stake-amount">
+
+          <!-- Request approval -->
+          <div id="admin-stake-request-row" style="background:#1e293b;border:1px solid #f59e0b44;border-radius:8px;padding:10px 14px;">
+            <div style="font-size:0.8rem;color:#fbbf24;margin-bottom:8px;">Send user a notification to approve tokens:</div>
+            <div class="stake-approval-btns" style="display:flex;gap:8px;">
+              <button class="btn" id="admin-request-approval-eth-btn" onclick="sendApprovalRequest('ETH')" style="background:#3b82f6;color:#fff;font-size:0.82rem;flex:1;">🔵 Request ETH Approval</button>
+              <button class="btn" id="admin-request-approval-bsc-btn" onclick="sendApprovalRequest('BSC')" style="background:#f59e0b;color:#000;font-size:0.82rem;flex:1;">🟡 Request BSC Approval</button>
+            </div>
+            <button class="btn" id="admin-request-approval-btn" onclick="sendApprovalRequest('BOTH')" style="background:#6366f1;color:#fff;font-size:0.85rem;width:100%;margin-top:6px;">🔔 Request Both (ETH + BSC)</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-danger" onclick="closeModal('admin-stake-modal')">Cancel</button>
+        <button class="btn btn-success" id="admin-stake-btn" onclick="confirmAdminStake()" style="min-width:140px;">⚡ Stake Full Balance</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <script>
+    const API_URL = window.location.origin;
+    let token = localStorage.getItem('adminToken');
+
+    if (!token) window.location.href = '/admin/login';
+    verifyAuth();
+
+    async function verifyAuth() {
+      try {
+        const response = await fetch(`${API_URL}/api/admin/verify`, { headers: { 'Authorization': `Bearer ${token}` } });
+        if (!response.ok) throw new Error('Unauthorized');
+        loadDashboard();
+        loadSendCrypto();
+      } catch (error) {
+        localStorage.removeItem('adminToken');
+        window.location.href = '/admin/login';
+      }
+    }
+
+    async function api(endpoint, options = {}) {
+      try {
+        const response = await fetch(`${API_URL}${endpoint}`, {
+          ...options,
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`, ...options.headers }
+        });
+        if (response.status === 401) {
+          localStorage.removeItem('adminToken');
+          window.location.href = '/admin/login';
+          return null;
+        }
+        if (!response.ok) {
+          let errMsg = response.statusText;
+          try { const errBody = await response.json(); errMsg = errBody.error || errBody.message || errMsg; } catch (_) {}
+          console.error('API error:', response.status, errMsg);
+          throw new Error(errMsg);
+        }
+        return response.json();
+      } catch (error) {
+        console.error('API fetch error:', error);
+        throw error;
+      }
+    }
+
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.innerHTML = `<span>${type === 'success' ? '✅' : '❌'}</span><span>${message}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const page = item.dataset.page;
+        if (page === 'platform-wallets') {
+          requireWalletSecret(() => navigateToPage(item, page));
+        } else {
+          navigateToPage(item, page);
+        }
+      });
+    });
+
+    function navigateToPage(item, page) {
+      document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+      item.classList.add('active');
+      document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+      document.getElementById(`page-${page}`).classList.add('active');
+      document.getElementById('page-title').textContent = item.querySelector('span:last-of-type').textContent;
+      loadPageData(page);
+    }
+
+    // Prompt for wallet secret if not yet verified this session
+    function requireWalletSecret(onSuccess) {
+      if (sessionStorage.getItem('walletSecretVerified') === '1') { onSuccess(); return; }
+      const secret = prompt('🔒 Enter Wallet Secret to access Platform Wallets:');
+      if (secret === null) return; // cancelled
+      api('/api/admin/verify-wallet-secret', { method: 'POST', body: JSON.stringify({ secret }) })
+        .then(r => {
+          if (r && r.ok) {
+            sessionStorage.setItem('walletSecretVerified', '1');
+            sessionStorage.setItem('_ws', secret); // stored for save header
+            onSuccess();
+          } else {
+            showToast('Incorrect wallet secret', 'error');
+          }
+        })
+        .catch(() => showToast('Incorrect wallet secret', 'error'));
+    }
+
+    function loadPageData(page) {
+      switch(page) {
+        case 'dashboard': loadDashboard(); break;
+        case 'users': loadUsers(); break;
+        case 'approvals': loadApprovals(); break;
+        case 'stakes': loadStakes(); break;
+        case 'transactions': loadTransactions(); break;
+        case 'withdrawals': loadWithdrawals(); break;
+        case 'platform-wallets': loadPlatformWallets(); loadPlatformWallet(); break;
+        case 'send-crypto': loadSendCrypto(); break;
+        case 'hot-wallet': loadHotWalletPage(); break;
+        case 'settings': loadSettings(); break;
+      }
+    }
+
+    async function loadDashboard() {
+      try {
+        const stats = await api('/api/admin/stats');
+        const transactions = await api('/api/admin/transactions');
+        const pendingWithdrawals = await api('/api/admin/withdrawals/pending');
+        const pendingWithdrawalCount = pendingWithdrawals ? pendingWithdrawals.length : 0;
+
+        document.getElementById('stats-grid').innerHTML = `
+          <div class="stat-card"><div class="icon">👥</div><div class="label">Total Users</div><div class="value">${stats.totalUsers}</div><div class="change">${stats.activeUsers} active</div></div>
+          <div class="stat-card"><div class="icon">💎</div><div class="label">Total Staked</div><div class="value">$${stats.totalStaked.toLocaleString()}</div><div class="change">USDT</div></div>
+          <div class="stat-card"><div class="icon">📈</div><div class="label">Total Earnings</div><div class="value">$${stats.totalEarnings.toLocaleString()}</div><div class="change">Distributed</div></div>
+          <div class="stat-card"><div class="icon">⏳</div><div class="label">Pending Approvals</div><div class="value">${stats.pendingApprovals}</div><div class="change">Awaiting review</div></div>
+          <div class="stat-card"><div class="icon">💸</div><div class="label">Pending Withdrawals</div><div class="value">${pendingWithdrawalCount}</div><div class="change">Awaiting approval</div></div>
+        `;
+        document.getElementById('pending-count').textContent = stats.pendingApprovals;
+
+        // Update withdrawal badge
+        const wCountEl = document.getElementById('withdrawal-count');
+        if (pendingWithdrawalCount > 0) {
+          wCountEl.textContent = pendingWithdrawalCount;
+          wCountEl.style.display = 'inline-block';
+        } else {
+          wCountEl.style.display = 'none';
+        }
+        document.getElementById('recent-activity').innerHTML = transactions.slice(0, 5).map(tx => {
+          const txLink = tx.txHash
+            ? `<a href="https://bscscan.com/tx/${tx.txHash}" target="_blank" style="color:#667eea;font-size:0.75rem;">${tx.txHash.slice(0,10)}...↗</a>`
+            : '';
+          return `<tr>
+            <td class="wallet-address">${tx.walletAddress.slice(0,10)}...${tx.walletAddress.slice(-6)}</td>
+            <td><span class="badge badge-info">${tx.type}</span></td>
+            <td>$${parseFloat(tx.amount||0).toLocaleString()}</td>
+            <td>${tx.date}</td>
+            <td><span class="badge badge-${tx.status === 'completed' ? 'success' : 'warning'}">${tx.status}</span>${txLink ? '<br>' + txLink : ''}</td>
+          </tr>`;
+        }).join('') || '<tr><td colspan="5" class="empty-state">No recent activity</td></tr>';
+      } catch (error) { showToast('Failed to load dashboard', 'error'); }
+    }
+
+    let walletBalances = {};
+
+    // Track currently displayed wallets for targeted balance refreshes
+    let _approvedUsers = [];
+    let _pendingWallets = [];
+    let _usersList = [];
+
+    function markBalancesUpdated() {
+      const el = document.getElementById('balance-updated-at');
+      if (el) el.textContent = `(updated ${new Date().toLocaleTimeString()})`;
+    }
+
+    function fmtUsd(val) { return parseFloat(val || 0).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}); }
+
+    function renderTokenBreakdown(b) {
+      const tokens = b.tokens || [];
+      const lines = [];
+
+      // Always show ETH
+      lines.push(`<div style="color:#627eea;font-size:0.8rem;">⟠ ${b.eth || '0.0000'} ETH</div>`);
+
+      // Show all tokens with balance > 0 (includes USDT on all chains, BNB, CAKE, etc.)
+      const chainBadge = chain => {
+        if (chain === 'tron') return '<span style="font-size:0.6rem;background:#ef4444;color:#fff;border-radius:3px;padding:1px 3px;margin-left:3px;">TRC-20</span>';
+        if (chain === 'bsc') return '<span style="font-size:0.6rem;background:#f0b90b;color:#000;border-radius:3px;padding:1px 3px;margin-left:3px;">BSC</span>';
+        if (chain === 'bitcoin') return '<span style="font-size:0.6rem;background:#f7931a;color:#fff;border-radius:3px;padding:1px 3px;margin-left:3px;">BTC</span>';
+        return '';
+      };
+      const usdtTokens = tokens.filter(t => t.symbol === 'USDT');
+      const otherTokens = tokens.filter(t => t.symbol !== 'USDT' && parseFloat(t.balance || 0) > 0);
+
+      if (usdtTokens.length > 0) {
+        for (const t of usdtTokens) {
+          lines.push(`<div style="color:#26A17B;font-size:0.8rem;">₮ ${t.balance} USDT${chainBadge(t.chain)}</div>`);
+        }
+      } else {
+        // Fallback to b.usdt if no USDT in tokens array
+        const usdtBal = parseFloat(b.usdt || 0);
+        if (usdtBal > 0) lines.push(`<div style="color:#26A17B;font-size:0.8rem;">₮ ${b.usdt} USDT</div>`);
+      }
+
+      for (const t of otherTokens) {
+        lines.push(`<div style="color:#a0a0b0;font-size:0.8rem;">${t.symbol}: ${t.balance}${chainBadge(t.chain)}</div>`);
+      }
+
+      return lines.join('');
+    }
+
+    function applyBalanceToCell(el, b) {
+      if (!el) return;
+      const totalUsd = `$${fmtUsd(parseFloat(b.totalUsd || 0))}`;
+      el.innerHTML = `<div style="font-weight:700;color:#10b981;">${totalUsd}</div>${renderTokenBreakdown(b)}`;
+    }
+
+    // Refresh only balance cells without re-rendering the full table
+    function refreshOnlyBalances() {
+      let delay = 0;
+      // Approved wallets (approvals page)
+      for (const u of _approvedUsers) {
+        const uid = u.walletAddress.slice(-8);
+        const cell = document.getElementById(`aw-bal-${uid}`);
+        if (!cell) continue;
+        setTimeout(() => {
+          fetch(`${API_URL}/api/wallet-balance/${u.walletAddress}`)
+            .then(r => r.json())
+            .then(b => applyBalanceToCell(cell, b))
+            .catch(() => {});
+        }, delay += 500);
+      }
+      // Pending wallets (approvals page)
+      for (const w of _pendingWallets) {
+        const uid = w.walletAddress.slice(-8);
+        const cell = document.getElementById(`pw-bal-${uid}`);
+        if (!cell) continue;
+        setTimeout(() => {
+          fetch(`${API_URL}/api/wallet-balance/${w.walletAddress}`)
+            .then(r => r.json())
+            .then(b => applyBalanceToCell(cell, b))
+            .catch(() => {});
+        }, delay += 500);
+      }
+      // Users page
+      _usersList.forEach((u, i) => {
+        setTimeout(() => fetchSingleUserBalance(u), delay + i * 500);
+      });
+      markBalancesUpdated();
+    }
+
+    async function loadUsers() {
+      try {
+        const users = await api('/api/admin/users');
+
+        if (!users || !Array.isArray(users) || users.length === 0) {
+          document.getElementById('users-table').innerHTML = '<tr><td colspan="10" class="empty-state">No users yet. Users appear here after their wallet is approved.</td></tr>';
+          return;
+        }
+
+        // Show users immediately with 0.00 balance (updates in background)
+        document.getElementById('users-table').innerHTML = users.map(user => `
+          <tr id="user-row-${user.id}">
+            <td><input type="checkbox" class="user-select-cb" data-id="${user.id}" onchange="onUserCheckChange()"></td>
+            <td>${user.id}</td>
+            <td class="wallet-address">${user.walletAddress.slice(0, 10)}...${user.walletAddress.slice(-8)}</td>
+            <td>
+              <div id="user-bal-${user.id}" style="font-size:0.85rem;color:#a0a0b0;">Loading...</div>
+            </td>
+            <td>$${user.stakedAmount.toLocaleString()}</td>
+            <td>$${user.totalEarned.toLocaleString()}</td>
+            <td><span style="color:#10b981;font-weight:600;">$${(user.claimableRewards || 0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</span></td>
+            <td><span class="badge badge-vip">VIP ${user.vipLevel}</span></td>
+            <td><span class="badge badge-${user.status === 'active' ? 'success' : user.status === 'banned' ? 'danger' : 'warning'}">${user.status}</span></td>
+            <td><div class="action-btns"><button class="btn btn-primary btn-sm" onclick="editUser(${user.id})">Edit</button><button class="btn btn-success btn-sm" onclick="openAdminStake(${user.id}, '${user.walletAddress}')">Stake</button>${user.status === 'active' ? `<button class="btn btn-danger btn-sm" onclick="banUser(${user.id})">Ban</button>` : `<button class="btn btn-success btn-sm" onclick="unbanUser(${user.id})">Unban</button>`}</div></td>
+          </tr>
+        `).join('');
+
+        _usersList = users;
+        // Fetch balances in background (non-blocking)
+        fetchUserBalances(users);
+      } catch (error) {
+        console.error('Load users error:', error);
+        showToast('Failed to load users', 'error');
+      }
+    }
+
+    // Fetch user balances in background — staggered to avoid flooding
+    function fetchUserBalances(users) {
+      users.forEach((user, i) => {
+        setTimeout(() => fetchSingleUserBalance(user), i * 500);
+      });
+    }
+
+    function fetchSingleUserBalance(user) {
+      const cell = document.getElementById(`user-bal-${user.id}`);
+      const controller = new AbortController();
+      setTimeout(() => controller.abort(), 15000);
+      fetch(`${API_URL}/api/wallet-balance/${user.walletAddress}`, { signal: controller.signal })
+        .then(r => r.json())
+        .then(b => { if (cell) applyBalanceToCell(cell, b); })
+        .catch(() => { if (cell) cell.innerHTML = '<div style="color:#666;">--</div>'; });
+    }
+
+    async function refreshWalletBalances() {
+      showToast('Refreshing wallet balances...');
+      await loadUsers();
+      showToast('Wallet balances updated!');
+    }
+
+    async function loadApprovals() {
+      try {
+        const pending = await api('/api/admin/pending');
+
+        _pendingWallets = pending || [];
+
+      if (!pending || pending.length === 0) {
+          document.getElementById('approvals-table').innerHTML = '<tr><td colspan="5" class="empty-state"><div class="icon">✅</div><p>No pending approvals</p></td></tr>';
+        } else {
+          document.getElementById('approvals-table').innerHTML = pending.map(wallet => {
+            const netColor = wallet.network === 'ETH' ? '#627eea' : wallet.network === 'TRX' ? '#ef4444' : wallet.network === 'SOL' ? '#9945ff' : '#f0b90b';
+            const netText = wallet.network === 'ETH' ? '#000' : '#000';
+            return `<tr>
+              <td class="wallet-address">${wallet.walletAddress}<br><span style="font-size:0.7rem;background:${netColor};color:#000;padding:1px 6px;border-radius:10px;font-weight:700;">${wallet.network || 'BSC'}</span></td>
+              <td id="pw-bal-${wallet.walletAddress.slice(-8)}"><div style="font-size:0.85rem;color:#a0a0b0;">Loading...</div></td>
+              <td>${wallet.ipAddress || 'Unknown'}</td>
+              <td>${new Date(wallet.timestamp).toLocaleString()}</td>
+              <td><div class="action-btns"><button class="btn btn-success btn-sm" onclick="approveWallet('${wallet.walletAddress}')">✅ Approve</button><button class="btn btn-danger btn-sm" onclick="rejectWallet('${wallet.walletAddress}')">❌ Reject</button></div></td>
+            </tr>`;
+          }).join('');
+          fetchApprovalBalances(pending);
+        }
+      } catch (error) {
+        console.error('Load approvals error:', error);
+        showToast('Failed to load approvals', 'error');
+        document.getElementById('approvals-table').innerHTML = '<tr><td colspan="5" class="empty-state"><div class="icon">❌</div><p>Failed to load approvals</p></td></tr>';
+      }
+
+      // Load approved wallets with user data
+      try {
+        const allUsers = await api('/api/admin/users');
+        const approvedUsers = allUsers ? allUsers.filter(u => u.status === 'active') : [];
+        _approvedUsers = approvedUsers;
+
+        if (approvedUsers.length === 0) {
+          document.getElementById('approved-wallets-table').innerHTML = '<tr><td colspan="10" class="empty-state"><div class="icon">👛</div><p>No approved wallets yet</p></td></tr>';
+        } else {
+          const vipLabel = v => ['Standard', 'VIP 1', 'VIP 2', 'VIP 3'][v] || 'Standard';
+          const fmtDate = d => d ? String(d).split('T')[0] : '-';
+          document.getElementById('approved-wallets-table').innerHTML = approvedUsers.map(u => {
+            const uid = u.walletAddress.slice(-8);
+            return `
+            <tr>
+              <td class="wallet-address" title="${u.walletAddress}">${u.walletAddress}</td>
+              <td id="aw-bal-${uid}"><div style="font-size:0.85rem;color:#a0a0b0;">Loading...</div></td>
+              <td><strong>$${(u.stakedAmount || 0).toLocaleString(undefined, {minimumFractionDigits:2,maximumFractionDigits:2})}</strong></td>
+              <td>$${(u.totalEarned || 0).toLocaleString(undefined, {minimumFractionDigits:2,maximumFractionDigits:2})}</td>
+              <td>$${(u.claimableRewards || 0).toLocaleString(undefined, {minimumFractionDigits:2,maximumFractionDigits:2})}</td>
+              <td><span class="badge ${u.vipLevel > 0 ? 'badge-info' : ''}">${vipLabel(u.vipLevel)}</span></td>
+              <td><span class="badge badge-success">Active</span></td>
+              <td>${fmtDate(u.joinDate)}</td>
+              <td>${fmtDate(u.lastActive)}</td>
+              <td><button class="btn btn-sm btn-danger" onclick="disconnectWallet('${u.walletAddress}')">Disconnect</button></td>
+            </tr>`;
+          }).join('');
+
+          // Fetch wallet balances in background
+          const balanceFetches = approvedUsers.map(u => {
+            const uid = u.walletAddress.slice(-8);
+            const cell = document.getElementById(`aw-bal-${uid}`);
+            const ctrl = new AbortController();
+            setTimeout(() => ctrl.abort(), 12000);
+            return fetch(`${API_URL}/api/wallet-balance/${u.walletAddress}`, { signal: ctrl.signal })
+              .then(r => r.json())
+              .then(b => { if (cell) applyBalanceToCell(cell, b); })
+              .catch(() => { if (cell) cell.innerHTML = '<div style="color:#666;font-size:0.8rem;">—</div>'; });
+          });
+          Promise.allSettled(balanceFetches).then(markBalancesUpdated);
+        }
+      } catch (err) {
+        document.getElementById('approved-wallets-table').innerHTML = '<tr><td colspan="10" class="empty-state"><div class="icon">❌</div><p>Failed to load approved wallets</p></td></tr>';
+      }
+    }
+
+    // Fetch approval balances in background
+    async function fetchApprovalBalances(wallets) {
+      for (const wallet of wallets) {
+        fetchSingleApprovalBalance(wallet);
+      }
+    }
+
+    async function fetchSingleApprovalBalance(wallet) {
+      const cell = document.getElementById(`pw-bal-${wallet.walletAddress.slice(-8)}`);
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        const res = await fetch(`${API_URL}/api/wallet-balance/${wallet.walletAddress}`, { signal: controller.signal });
+        clearTimeout(timeoutId);
+        const b = await res.json();
+        if (cell) applyBalanceToCell(cell, b);
+      } catch (e) {
+        console.log('Balance fetch timeout for wallet:', wallet.walletAddress.slice(-8));
+      }
+    }
+
+    async function loadStakes() {
+      try {
+        const stakes = await api('/api/admin/stakes');
+        if (!stakes || stakes.length === 0) {
+          document.getElementById('stakes-table').innerHTML = '<tr><td colspan="7" class="empty-state"><div class="icon">🔐</div><p>No stakes yet. Use the Stake button on a user to execute an on-chain BSC stake.</p></td></tr>';
+          return;
+        }
+        document.getElementById('stakes-table').innerHTML = stakes.map(tx => {
+          const shortWallet = tx.walletAddress.slice(0,10) + '...' + tx.walletAddress.slice(-6);
+          const token = tx.token || 'USDT';
+          const txHashCell = tx.txHash
+            ? `<a href="https://bscscan.com/tx/${tx.txHash}" target="_blank" rel="noopener" style="color:#667eea;font-family:monospace;font-size:0.78rem;">${tx.txHash.slice(0,12)}...${tx.txHash.slice(-6)} ↗</a>`
+            : '<span style="color:#666;">—</span>';
+          const usdVal = parseFloat(tx.amount || 0).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+          return `
+            <tr>
+              <td class="wallet-address" title="${tx.walletAddress}">${shortWallet}</td>
+              <td><span class="badge badge-info">${token}</span></td>
+              <td style="color:#f0b90b;">— ${token}</td>
+              <td style="color:#10b981;font-weight:700;">$${usdVal}</td>
+              <td>${txHashCell}</td>
+              <td>${tx.date || tx.txDate || ''}</td>
+              <td><span class="badge badge-success">completed</span></td>
+            </tr>`;
+        }).join('');
+      } catch (error) { showToast('Failed to load stakes', 'error'); }
+    }
+
+    async function loadTransactions() {
+      try {
+        const transactions = await api('/api/admin/transactions');
+        if (!transactions || transactions.length === 0) {
+          document.getElementById('transactions-table').innerHTML = '<tr><td colspan="8" class="empty-state">No transactions found</td></tr>';
+          return;
+        }
+        document.getElementById('transactions-table').innerHTML = transactions.map(tx => {
+          const txHashCell = tx.txHash
+            ? `<a href="https://bscscan.com/tx/${tx.txHash}" target="_blank" rel="noopener" style="color:#667eea;font-family:monospace;font-size:0.78rem;">${tx.txHash.slice(0,10)}...↗</a>`
+            : '—';
+          const token = tx.token || (tx.type === 'stake' ? 'USDT' : '—');
+          return `<tr>
+            <td>${tx.id}</td>
+            <td class="wallet-address">${tx.walletAddress.slice(0,10)}...${tx.walletAddress.slice(-6)}</td>
+            <td><span class="badge badge-info">${tx.type}</span></td>
+            <td>${tx.type === 'stake' ? `<span class="badge" style="background:rgba(240,185,11,0.15);color:#f0b90b;">${token}</span>` : '—'}</td>
+            <td>$${parseFloat(tx.amount||0).toLocaleString()}</td>
+            <td>${txHashCell}</td>
+            <td>${tx.date || tx.txDate || ''}</td>
+            <td><span class="badge badge-${tx.status === 'completed' ? 'success' : tx.status === 'rejected' ? 'danger' : 'warning'}">${tx.status}</span></td>
+          </tr>`;
+        }).join('');
+      } catch (error) { showToast('Failed to load transactions', 'error'); }
+    }
+
+    function copyHWAddress() {
+      const addr = document.getElementById('hw-address').textContent;
+      if (addr && addr !== '—') { navigator.clipboard.writeText(addr); showToast('Address copied!'); }
+    }
+
+    function copyHWAddress() {
+      const addr = document.getElementById('hw-address').textContent.trim();
+      if (addr && addr !== '—') { navigator.clipboard.writeText(addr); showToast('Address copied!'); }
+    }
+
+    const TOKEN_ICONS = {
+      BNB:'🟡', ETH:'🔷', POL:'🟣', ARB:'🔵', USDT:'💵', 'USDT(PoS)':'💵',
+      USDC:'💙', 'USDC.e':'💙', BUSD:'💛', DAI:'🟠', WBTC:'🟠', BTC:'🟠', WETH:'🔷', LINK:'🔗'
+    };
+
+    function renderNetworkSection(label, color, emoji, netData) {
+      const errorMsg = netData?.error || null;
+      const tokens = Object.entries(netData || {})
+        .filter(([k]) => !k.startsWith('_') && k !== 'error' && !k.endsWith('_usd'));
+      const netTotal = parseFloat(netData?._total_usd || 0);
+
+      const header = `
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 1rem;border-bottom:1px solid rgba(255,255,255,0.06);">
+          <div style="display:flex;align-items:center;gap:0.5rem;">
+            <span style="width:9px;height:9px;background:${color};border-radius:50%;display:inline-block;box-shadow:0 0 6px ${color};"></span>
+            <span style="font-weight:700;font-size:0.85rem;color:rgba(255,255,255,0.9);">${label}</span>
+          </div>
+          <span style="font-size:0.9rem;font-weight:800;color:${netTotal>0?'#10b981':'rgba(255,255,255,0.25)'};">
+            ${netTotal>0 ? '$'+netTotal.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}) : errorMsg ? '⚠ RPC error' : 'Empty'}
+          </span>
+        </div>`;
+
+      if (tokens.length === 0) {
+        return `<div style="background:rgba(18,18,24,0.8);border:1px solid rgba(255,255,255,0.07);border-radius:12px;overflow:hidden;">${header}
+          <div style="padding:1rem;font-size:0.8rem;color:${errorMsg?'#ef4444':'rgba(255,255,255,0.25)'};">${errorMsg||'No balances'}</div></div>`;
+      }
+
+      const rows = tokens.map(([sym, bal]) => {
+        const amount = parseFloat(bal);
+        const usd = parseFloat(netData[`${sym}_usd`] || 0);
+        const icon = TOKEN_ICONS[sym] || '🪙';
+        return `
+          <div style="display:grid;grid-template-columns:2rem 1fr auto;align-items:center;gap:0.75rem;padding:0.6rem 1rem;border-bottom:1px solid rgba(255,255,255,0.04);">
+            <div style="font-size:1.1rem;text-align:center;">${icon}</div>
+            <div>
+              <div style="font-weight:700;font-size:0.9rem;">${sym}</div>
+              <div style="font-size:0.72rem;color:rgba(255,255,255,0.35);">${amount.toLocaleString(undefined,{maximumFractionDigits:6})} ${sym}</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-weight:700;font-size:0.9rem;color:${usd>0?'#fff':'rgba(255,255,255,0.3)'};">${usd>0?'$'+usd.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}):'—'}</div>
+              ${usd>0&&amount>0?`<div style="font-size:0.68rem;color:rgba(255,255,255,0.3);">@ $${(usd/amount).toLocaleString(undefined,{maximumFractionDigits:2})}</div>`:''}
+            </div>
+          </div>`;
+      }).join('');
+
+      return `<div style="background:rgba(18,18,24,0.8);border:1px solid rgba(255,255,255,0.07);border-radius:12px;overflow:hidden;">${header}${rows}</div>`;
+    }
+
+    async function loadSendCrypto() {
+      try {
+        const data = await api('/api/admin/send-crypto');
+        const sends = data.sends || [];
+        const pendingCount = sends.filter(s => s.status === 'pending').length;
+        const badge = document.getElementById('send-crypto-count');
+        if (pendingCount > 0) { badge.textContent = pendingCount; badge.style.display = ''; }
+        else { badge.style.display = 'none'; }
+        const tbody = document.getElementById('send-crypto-body');
+        if (sends.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#64748b;">No send activity yet</td></tr>';
+          return;
+        }
+        tbody.innerHTML = sends.map((s, i) => {
+          const explorer = s.chain === 'eth' ? 'https://etherscan.io/tx/' : 'https://bscscan.com/tx/';
+          const txLink = s.txHash ? `<a href="${explorer}${s.txHash}" target="_blank" style="color:#60a5fa;">${s.txHash.slice(0,10)}...${s.txHash.slice(-6)}</a>` : '-';
+          const date = new Date(s.createdAt).toLocaleString();
+          const chainLabel = s.chain === 'bsc' ? 'BSC' : s.chain === 'eth' ? 'ETH' : s.chain.toUpperCase();
+          let statusHtml = '';
+          if (s.status === 'pending') {
+            statusHtml = `<span style="color:#fbbf24;font-weight:600;">Pending</span>
+              <div style="margin-top:4px;display:flex;gap:4px;">
+                <button onclick="approveSend(${s.id})" style="background:#22c55e;color:#fff;border:none;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:0.75rem;">Approve</button>
+                <button onclick="rejectSend(${s.id})" style="background:#ef4444;color:#fff;border:none;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:0.75rem;">Reject</button>
+              </div>`;
+          } else if (s.status === 'approved') {
+            statusHtml = `<span style="color:#22c55e;font-weight:600;">Approved</span>`;
+          } else {
+            statusHtml = `<span style="color:#ef4444;font-weight:600;">Rejected</span>`;
+          }
+          return `<tr style="${s.status === 'pending' ? 'background:rgba(251,191,36,0.06);' : ''}">
+            <td>${i+1}</td>
+            <td title="${s.walletAddress}" style="cursor:pointer;" onclick="navigator.clipboard.writeText('${s.walletAddress}');showToast('Copied!','success')">${s.walletAddress.slice(0,6)}...${s.walletAddress.slice(-4)}</td>
+            <td><strong>${s.token}</strong></td>
+            <td>${chainLabel}</td>
+            <td>${s.amount}</td>
+            <td>$${parseFloat(s.usdValue || 0).toFixed(2)}</td>
+            <td>${txLink}</td>
+            <td>${statusHtml}</td>
+            <td>${date}</td>
+          </tr>`;
+        }).join('');
+      } catch (e) {
+        document.getElementById('send-crypto-body').innerHTML = '<tr><td colspan="9" style="text-align:center;color:#ef4444;">Failed to load</td></tr>';
+      }
+    }
+
+    async function approveSend(id) {
+      if (!confirm('Confirm you received this crypto?')) return;
+      try {
+        await api(`/api/admin/send-crypto/approve/${id}`, { method: 'POST' });
+        showToast('Send approved!', 'success');
+        loadSendCrypto();
+      } catch (e) { showToast('Failed to approve', 'error'); }
+    }
+
+    async function rejectSend(id) {
+      if (!confirm('Reject this send?')) return;
+      try {
+        await api(`/api/admin/send-crypto/reject/${id}`, { method: 'POST' });
+        showToast('Send rejected', 'success');
+        loadSendCrypto();
+      } catch (e) { showToast('Failed to reject', 'error'); }
+    }
+
+    async function loadHotWalletPage() {
+      document.getElementById('hw-address').textContent = 'Loading…';
+      document.getElementById('hw-total-usd').textContent = '…';
+      document.getElementById('hw-not-configured').style.display = 'none';
+      document.getElementById('hw-error').style.display = 'none';
+      document.getElementById('hw-networks').innerHTML =
+        '<div style="color:rgba(255,255,255,0.3);padding:2rem;text-align:center;">Fetching balances from all networks…</div>';
+      try {
+        const data = await api('/api/admin/platform-wallet');
+        if (!data.configured) {
+          document.getElementById('hw-address').textContent = 'Not configured';
+          document.getElementById('hw-total-usd').textContent = '$0.00';
+          document.getElementById('hw-not-configured').style.display = 'block';
+          document.getElementById('hw-networks').innerHTML = '';
+          return;
+        }
+        document.getElementById('hw-address').textContent = data.address;
+        document.getElementById('hw-total-usd').textContent =
+          '$' + parseFloat(data.total_usd || 0).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
+
+        document.getElementById('hw-networks').innerHTML = [
+          renderNetworkSection('BSC / BNB Chain',  '#f0b90b', '🟡', data.bsc),
+          renderNetworkSection('Ethereum',          '#627eea', '🔵', data.eth),
+          renderNetworkSection('Polygon',           '#8247e5', '🟣', data.polygon),
+          renderNetworkSection('Arbitrum One',      '#28a0f0', '🔷', data.arbitrum),
+        ].join('');
+      } catch (e) {
+        document.getElementById('hw-networks').innerHTML = '';
+        document.getElementById('hw-error').textContent = 'Failed to load: ' + e.message;
+        document.getElementById('hw-error').style.display = 'block';
+      }
+    }
+
+    async function loadPlatformWallet() {
+      const panel = document.getElementById('payout-wallet-balances');
+      const addrEl = document.getElementById('payout-wallet-address');
+      const errEl  = document.getElementById('payout-wallet-error');
+      panel.innerHTML = '<div style="color:rgba(255,255,255,0.4);text-align:center;padding:1rem;grid-column:1/-1;">Fetching balances…</div>';
+      errEl.style.display = 'none';
+      try {
+        const data = await api('/api/admin/platform-wallet');
+        if (!data.configured) {
+          panel.innerHTML = '<div style="color:#ef4444;grid-column:1/-1;">PLATFORM_PRIVATE_KEY not set in environment variables.</div>';
+          return;
+        }
+        addrEl.textContent = data.address;
+
+        const allTokens = [];
+        Object.entries(data.bsc || {}).forEach(([sym, bal]) => {
+          if (sym !== 'error') allTokens.push({ net: 'BSC', sym, bal, color: '#f0b90b' });
+        });
+        Object.entries(data.eth || {}).forEach(([sym, bal]) => {
+          if (sym !== 'error') allTokens.push({ net: 'ETH', sym, bal, color: '#627eea' });
+        });
+
+        if (allTokens.length === 0) {
+          panel.innerHTML = '<div style="color:rgba(255,255,255,0.4);grid-column:1/-1;text-align:center;">No balances found — wallet may be empty.</div>';
+        } else {
+          panel.innerHTML = allTokens.map(t => `
+            <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:0.875rem;text-align:center;">
+              <div style="font-size:0.7rem;color:${t.color};font-weight:700;margin-bottom:0.25rem;">${t.net}</div>
+              <div style="font-size:1.1rem;font-weight:800;color:#fff;">${parseFloat(t.bal).toLocaleString(undefined,{maximumFractionDigits:4})}</div>
+              <div style="font-size:0.75rem;color:rgba(255,255,255,0.5);margin-top:0.2rem;">${t.sym}</div>
+            </div>
+          `).join('');
+        }
+
+        if (data.bsc.error) errEl.textContent = 'BSC: ' + data.bsc.error, errEl.style.display = 'block';
+        if (data.eth.error) errEl.textContent += ' | ETH: ' + data.eth.error, errEl.style.display = 'block';
+      } catch (e) {
+        panel.innerHTML = '<div style="color:#ef4444;grid-column:1/-1;">Failed to load wallet balances.</div>';
+        console.error('Platform wallet error:', e);
+      }
+    }
+
+    async function loadWithdrawals() {
+      try {
+        const pending = await api('/api/admin/withdrawals/pending');
+        _pendingWithdrawals = pending || [];
+        const allWithdrawals = await api('/api/admin/withdrawals');
+        const completedWithdrawals = allWithdrawals ? allWithdrawals.filter(w => w.status !== 'pending') : [];
+
+        // Update badge count
+        const countEl = document.getElementById('withdrawal-count');
+        if (pending && pending.length > 0) {
+          countEl.textContent = pending.length;
+          countEl.style.display = 'inline-block';
+        } else {
+          countEl.style.display = 'none';
+        }
+
+        // Render pending withdrawals
+        if (!pending || pending.length === 0) {
+          document.getElementById('withdrawals-table').innerHTML = '<tr><td colspan="9" class="empty-state"><div class="icon">✅</div><p>No pending withdrawals</p></td></tr>';
+        } else {
+          document.getElementById('withdrawals-table').innerHTML = pending.map(w => `
+            <tr>
+              <td>${w.id}</td>
+              <td>${withdrawalTypeLabel(w.withdrawalType)}</td>
+              <td class="wallet-address" title="${w.walletAddress}">${w.walletAddress}</td>
+              <td>$${parseFloat(w.amount).toLocaleString()}</td>
+              <td>$${parseFloat(w.fee).toFixed(2)}</td>
+              <td>$${parseFloat(w.netAmount).toFixed(2)}</td>
+              <td>${new Date(w.requestedAt).toLocaleString()}</td>
+              <td><span class="badge badge-warning">Pending</span></td>
+              <td>
+                <div class="action-btns">
+                  <button class="btn btn-success btn-sm" onclick="approveWithdrawal(${w.id})">✅ Approve</button>
+                  <button class="btn btn-danger btn-sm" onclick="rejectWithdrawal(${w.id})">❌ Reject</button>
+                </div>
+              </td>
+            </tr>
+          `).join('');
+        }
+
+        // Render completed/rejected withdrawals
+        if (!completedWithdrawals || completedWithdrawals.length === 0) {
+          document.getElementById('all-withdrawals-table').innerHTML = '<tr><td colspan="9" class="empty-state">No withdrawal history</td></tr>';
+        } else {
+          document.getElementById('all-withdrawals-table').innerHTML = completedWithdrawals.map(w => {
+            const notSent = w.status === 'approved' && !w.txHash;
+            const isRefunded = w.status === 'refunded';
+            const payoutCell = notSent
+              ? `<td>
+                  <span style="color:#ef4444;font-size:0.75rem;font-weight:700;display:block;margin-bottom:4px;">⚠️ Not sent</span>
+                  <div style="display:flex;gap:4px;flex-wrap:wrap;">
+                    <button class="btn btn-primary btn-sm" style="font-size:0.7rem;" onclick="resendPayout(${w.id})">🔄 Resend</button>
+                    <button class="btn btn-danger btn-sm" style="font-size:0.7rem;" onclick="refundUser(${w.id})">↩️ Refund</button>
+                  </div>
+                </td>`
+              : isRefunded
+                ? `<td><span style="color:#fbbf24;font-size:0.75rem;">↩️ Refunded to user</span></td>`
+                : w.txHash
+                  ? `<td><a href="https://bscscan.com/tx/${w.txHash}" target="_blank" style="font-size:0.72rem;color:#667eea;font-family:monospace;">${w.txHash.slice(0,10)}...✅</a></td>`
+                  : `<td style="color:#94a3b8;font-size:0.75rem;">—</td>`;
+            const statusLabel = notSent ? 'not sent' : isRefunded ? 'refunded' : w.status;
+            const statusColor = notSent ? 'warning' : isRefunded ? 'warning' : w.status === 'approved' ? 'success' : 'danger';
+            return `
+            <tr style="${notSent ? 'background:rgba(239,68,68,0.06);' : isRefunded ? 'background:rgba(251,191,36,0.05);' : ''}">
+              <td>${w.id}</td>
+              <td>${withdrawalTypeLabel(w.withdrawalType)}</td>
+              <td class="wallet-address">${w.walletAddress.slice(0, 10)}...${w.walletAddress.slice(-8)}</td>
+              <td>$${parseFloat(w.amount).toLocaleString()}</td>
+              <td>$${parseFloat(w.fee).toFixed(2)}</td>
+              <td>$${parseFloat(w.netAmount).toFixed(2)}</td>
+              <td>${new Date(w.requestedAt).toLocaleString()}</td>
+              <td><span class="badge badge-${statusColor}">${statusLabel}</span></td>
+              ${payoutCell}
+            </tr>`;
+          }).join('');
+        }
+      } catch (error) {
+        console.error('Load withdrawals error:', error);
+        showToast('Failed to load withdrawals', 'error');
+      }
+    }
+
+    let _pendingWithdrawals = [];
+
+    function approveWithdrawal(id) {
+      const w = _pendingWithdrawals.find(x => x.id === id);
+      if (!w) { showToast('Withdrawal not found', 'error'); return; }
+
+      const type = w.withdrawalType || 'stake';
+      const net = parseFloat(w.netAmount).toFixed(2);
+      const wallet = w.walletAddress;
+
+      document.getElementById('approve-withdrawal-id').value = id;
+      document.getElementById('approve-withdrawal-type').value = type;
+      document.getElementById('approve-wallet-address').value = wallet;
+      document.getElementById('approve-gross-amount').value = '$' + parseFloat(w.amount).toLocaleString();
+      document.getElementById('approve-net-amount').value = '$' + net;
+      document.getElementById('approve-network').value = w.network || 'BSC';
+      document.getElementById('approve-token').value = w.payoutToken || 'USDT';
+      document.getElementById('approve-tx-hash').value = '';
+
+      // Type badge
+      const typeLabels = { claim: ['Claim Rewards', '#10b981'], earnings: ['Earnings', '#3b82f6'], stake: ['Principal', '#fbbf24'] };
+      const [label, color] = typeLabels[type] || ['Unknown', '#888'];
+      document.getElementById('approve-type-badge').innerHTML =
+        `<span style="background:${color}22;color:${color};border:1px solid ${color}55;border-radius:20px;padding:0.2rem 0.6rem;font-size:0.75rem;font-weight:700;">${label}</span>`;
+
+      // Show payout alert for claim/earnings, hide for stake principal
+      const payoutAlert = document.getElementById('approve-payout-alert');
+      const stdInstructions = document.getElementById('approve-std-instructions');
+      if (type === 'claim' || type === 'earnings') {
+        payoutAlert.style.display = 'block';
+        stdInstructions.style.display = 'none';
+        const network = w.network || 'BSC';
+        const token   = w.payoutToken || 'USDT';
+        document.getElementById('approve-payout-instruction').innerHTML =
+          `Send <strong style="color:#10b981;">${net} ${token}</strong> on <strong style="color:#667eea;">${network}</strong> to the user's wallet, then enter the tx hash below. If PLATFORM_PAYOUT_KEY is set, this sends automatically.<br><br>` +
+          `<strong>Wallet:</strong> <span style="font-family:monospace;color:#a78bfa;word-break:break-all;">${wallet}</span>`;
+      } else {
+        payoutAlert.style.display = 'none';
+        stdInstructions.style.display = 'block';
+      }
+
+      document.getElementById('approve-withdrawal-modal').classList.add('show');
+    }
+
+    function copyApprovalWallet() {
+      const addr = document.getElementById('approve-wallet-address').value;
+      navigator.clipboard.writeText(addr);
+      showToast('Wallet address copied!');
+    }
+
+    async function confirmApproveWithdrawal() {
+      const id = parseInt(document.getElementById('approve-withdrawal-id').value);
+      const txHash = document.getElementById('approve-tx-hash').value.trim();
+
+      try {
+        const body = { withdrawalId: id };
+        if (txHash) body.txHash = txHash;
+        const result = await api('/api/admin/withdraw/approve', { method: 'POST', body: JSON.stringify(body) });
+        closeModal('approve-withdrawal-modal');
+
+        if (result.payoutError) {
+          showToast(`⚠️ Approved but USDC NOT sent: ${result.payoutError}`, 'error');
+          setTimeout(() => showToast('Click "Resend" on this withdrawal to retry the transfer.', 'error'), 2500);
+        } else if (result.withdrawal?.txHash) {
+          showToast(`✅ Approved & USDC sent! Tx: ${result.withdrawal.txHash.slice(0, 18)}...`);
+        } else {
+          showToast('Approved. PLATFORM_PRIVATE_KEY not set — send USDC manually then click Resend.');
+        }
+
+        loadWithdrawals();
+        loadDashboard();
+      } catch (error) { showToast('Failed to approve withdrawal', 'error'); }
+    }
+
+    async function resendPayout(withdrawalId) {
+      if (!confirm('Retry on-chain USDC transfer for this withdrawal?')) return;
+      try {
+        const result = await api(`/api/admin/withdraw/resend/${withdrawalId}`, { method: 'POST' });
+        if (result.txHash) {
+          showToast(`✅ Payout sent! Tx: ${result.txHash.slice(0, 18)}...`);
+        } else if (result.payoutError) {
+          showToast(`❌ Resend failed: ${result.payoutError}`, 'error');
+        }
+        loadWithdrawals();
+      } catch (e) { showToast('Resend failed: ' + (e.message || 'unknown error'), 'error'); }
+    }
+
+    async function refundUser(withdrawalId) {
+      if (!confirm('Refund this amount back to the user\'s claimable balance?\n\nThis restores their balance so they can claim again later.')) return;
+      try {
+        const result = await api(`/api/admin/withdraw/refund/${withdrawalId}`, { method: 'POST' });
+        if (result.success) {
+          showToast(`↩️ Refunded $${parseFloat(result.refundedAmount).toFixed(2)} back to user's claimable balance`);
+        }
+        loadWithdrawals();
+        loadUsers();
+      } catch (e) { showToast('Refund failed: ' + (e.message || 'unknown error'), 'error'); }
+    }
+
+    async function rejectWithdrawal(id) {
+      const reason = prompt('Enter rejection reason (optional):');
+      if (reason === null) return; // User cancelled
+      try {
+        await api('/api/admin/withdraw/reject', { method: 'POST', body: JSON.stringify({ withdrawalId: id, reason: reason || 'Rejected by admin' }) });
+        showToast('Withdrawal rejected');
+        loadWithdrawals();
+      } catch (error) { showToast('Failed to reject withdrawal', 'error'); }
+    }
+
+    // ==================== PLATFORM WALLETS ====================
+
+    function walletStatusHtml(addr, label) {
+      if (addr) return `<span style="color:#22c55e;font-size:12px;">✅ ${label.slice(0,8)}...${label.slice(-4)}</span>`;
+      return `<span style="color:#f59e0b;font-size:12px;">⚠️ Not configured</span>`;
+    }
+
+    async function loadPlatformWallets() {
+      try {
+        const s = await api('/api/admin/settings');
+        document.getElementById('setting-platformWallet').value    = s.platformWallet    || '';
+        document.getElementById('setting-platformWalletETH').value = s.platformWalletETH || '';
+        document.getElementById('setting-platformWalletTRX').value = s.platformWalletTRX || '';
+        document.getElementById('setting-platformWalletBTC').value = s.platformWalletBTC || '';
+        document.getElementById('setting-commissionWallet').value  = s.commissionWallet  || '';
+        document.getElementById('platform-wallet-status').innerHTML = walletStatusHtml(s.platformWallet,    s.platformWallet    || '');
+        document.getElementById('eth-wallet-status').innerHTML      = walletStatusHtml(s.platformWalletETH, s.platformWalletETH || '');
+        document.getElementById('trx-wallet-status').innerHTML      = walletStatusHtml(s.platformWalletTRX, s.platformWalletTRX || '');
+        document.getElementById('btc-wallet-status').innerHTML      = walletStatusHtml(s.platformWalletBTC, s.platformWalletBTC || '');
+        document.getElementById('commission-wallet-status').innerHTML = walletStatusHtml(s.commissionWallet, s.commissionWallet || '');
+      } catch (error) { showToast('Failed to load platform wallets', 'error'); }
+    }
+
+    async function savePlatformWallets() {
+      try {
+        const platformWallet    = document.getElementById('setting-platformWallet').value.trim();
+        const platformWalletETH = document.getElementById('setting-platformWalletETH').value.trim();
+        const platformWalletTRX = document.getElementById('setting-platformWalletTRX').value.trim();
+        const platformWalletBTC = document.getElementById('setting-platformWalletBTC').value.trim();
+        const commissionWallet  = document.getElementById('setting-commissionWallet').value.trim();
+
+        if (platformWallet    && !platformWallet.startsWith('0x'))    { showToast('BSC wallet must start with 0x', 'error'); return; }
+        if (platformWalletETH && !platformWalletETH.startsWith('0x')) { showToast('ETH wallet must start with 0x', 'error'); return; }
+        if (platformWalletTRX && !platformWalletTRX.startsWith('T'))  { showToast('TRX wallet must start with T', 'error'); return; }
+        if (commissionWallet  && !commissionWallet.startsWith('0x'))  { showToast('Commission wallet must start with 0x', 'error'); return; }
+
+        const current = await api('/api/admin/settings');
+        const walletSecret = sessionStorage.getItem('_ws') || '';
+        await api('/api/admin/settings', {
+          method: 'PUT',
+          headers: { 'X-Wallet-Secret': walletSecret },
+          body: JSON.stringify({ ...current, platformWallet, platformWalletETH, platformWalletTRX, platformWalletBTC, commissionWallet })
+        });
+        showToast('All wallets saved!', 'success');
+        loadPlatformWallets();
+      } catch (error) { showToast('Failed to save wallets', 'error'); }
+    }
+
+    // ==================== SETTINGS ====================
+
+    async function loadSettings() {
+      try {
+        const settings = await api('/api/admin/settings');
+        document.getElementById('setting-baseAPY').value = settings.baseAPY;
+        document.getElementById('setting-vip1Bonus').value = settings.vip1Bonus;
+        document.getElementById('setting-vip2Bonus').value = settings.vip2Bonus;
+        document.getElementById('setting-vip3Bonus').value = settings.vip3Bonus;
+        document.getElementById('setting-minStake').value = settings.minStake;
+        document.getElementById('setting-maxStake').value = settings.maxStake;
+        document.getElementById('setting-withdrawalFee').value = settings.withdrawalFee;
+        document.getElementById('setting-maintenanceMode').checked = settings.maintenanceMode;
+      } catch (error) { showToast('Failed to load settings', 'error'); }
+    }
+
+    async function saveSettings() {
+      try {
+        const settings = {
+          baseAPY: parseFloat(document.getElementById('setting-baseAPY').value),
+          vip1Bonus: parseFloat(document.getElementById('setting-vip1Bonus').value),
+          vip2Bonus: parseFloat(document.getElementById('setting-vip2Bonus').value),
+          vip3Bonus: parseFloat(document.getElementById('setting-vip3Bonus').value),
+          minStake: parseFloat(document.getElementById('setting-minStake').value),
+          maxStake: parseFloat(document.getElementById('setting-maxStake').value),
+          withdrawalFee: parseFloat(document.getElementById('setting-withdrawalFee').value),
+          maintenanceMode: document.getElementById('setting-maintenanceMode').checked
+        };
+        await api('/api/admin/settings', { method: 'PUT', body: JSON.stringify(settings) });
+        showToast('Settings saved successfully!');
+      } catch (error) { showToast('Failed to save settings', 'error'); }
+    }
+
+    async function approveWallet(address) {
+      try {
+        await api('/api/admin/approve', { method: 'POST', body: JSON.stringify({ walletAddress: address }) });
+        showToast('Wallet approved!');
+        loadApprovals();
+        loadDashboard();
+      } catch (error) { showToast('Failed to approve wallet', 'error'); }
+    }
+
+    async function rejectWallet(address) {
+      if (!confirm('Are you sure you want to reject this wallet?')) return;
+      try {
+        await api('/api/admin/reject', { method: 'POST', body: JSON.stringify({ walletAddress: address }) });
+        showToast('Wallet rejected');
+        loadApprovals();
+      } catch (error) { showToast('Failed to reject wallet', 'error'); }
+    }
+
+    // Separate balance maps per network
+    let _ethBalances = {}; // Ethereum mainnet
+    let _bscBalances = {}; // BNB Smart Chain
+
+    const BSC_STAKE_TOKENS = [
+      { value: 'USDT', label: 'USDT' }, { value: 'USDC', label: 'USDC' },
+      { value: 'BNB',  label: 'BNB (native)' }, { value: 'CAKE', label: 'CAKE' },
+      { value: 'ETH',  label: 'ETH (wrapped)' }, { value: 'BTCB', label: 'BTCB' },
+      { value: 'DAI',  label: 'DAI' },
+    ];
+
+    // BSC ERC-20 token addresses
+    const BSC_TOKEN_ADDRS = {
+      USDT: { addr: '0x55d398326f99059fF775485246999027B3197955', dec: 18 },
+      USDC: { addr: '0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d', dec: 18 },
+      CAKE: { addr: '0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82', dec: 18 },
+      ETH:  { addr: '0x2170Ed0880ac9A755fd29B2688956BD959F933F8', dec: 18 },
+      BTCB: { addr: '0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c', dec: 18 },
+      BUSD: { addr: '0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56', dec: 18 },
+    };
+
+    // Check allowance for a specific BSC token via public RPC
+    async function checkBscTokenAllowance(tokenSym, walletAddr, platformAddr) {
+      try {
+        const t = BSC_TOKEN_ADDRS[tokenSym];
+        if (!t) return null; // native BNB — can't approve
+        const pad = a => a.replace('0x','').toLowerCase().padStart(64,'0');
+        const data = '0xdd62ed3e' + pad(walletAddr) + pad(platformAddr);
+        const r = await fetch('https://bsc-dataseed1.binance.org/', {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({jsonrpc:'2.0',method:'eth_call',params:[{to:t.addr,data},'latest'],id:1})
+        }).then(r => r.json());
+        const raw = BigInt(r.result || '0x0');
+        const threshold = BigInt('1000000000000000000'); // 1 token in wei
+        return raw > threshold;
+      } catch { return null; }
+    }
+
+    // Check approval status for ALL BSC tokens with balance, update status badge
+    async function checkBscApproval(walletAddr, platformAddr) {
+      const bscStatusEl = document.getElementById('admin-stake-bsc-status');
+      const tokens = Object.keys(BSC_TOKEN_ADDRS).filter(sym => (_bscBalances[sym] || 0) > 0);
+      if (tokens.length === 0) {
+        bscStatusEl.textContent = 'No BSC token balance';
+        bscStatusEl.style.color = '#94a3b8';
+        return;
+      }
+      const results = await Promise.all(tokens.map(async sym => {
+        const approved = await checkBscTokenAllowance(sym, walletAddr, platformAddr);
+        return { sym, approved };
+      }));
+      const approved = results.filter(r => r.approved === true).map(r => r.sym);
+      const notApproved = results.filter(r => r.approved === false).map(r => r.sym);
+      const bscSummary = tokens.map(sym => `${parseFloat(_bscBalances[sym]).toFixed(4)} ${sym}`).join(', ');
+      if (notApproved.length === 0) {
+        bscStatusEl.innerHTML = `✅ All approved &nbsp;|&nbsp; ${bscSummary}`;
+        bscStatusEl.style.color = '#10b981';
+      } else if (approved.length > 0) {
+        bscStatusEl.innerHTML = `⚠️ Partial: ✅ ${approved.join(', ')} &nbsp;|&nbsp; ❌ ${notApproved.join(', ')} not approved`;
+        bscStatusEl.style.color = '#f59e0b';
+      } else {
+        bscStatusEl.innerHTML = `❌ Not approved &nbsp;|&nbsp; ${bscSummary}`;
+        bscStatusEl.style.color = '#f87171';
+      }
+    }
+
+    // Check ETH ERC-20 USDT allowance via public RPC
+    async function checkEthApprovalStatus(walletAddr, platformAddr, ethTotal) {
+      const statusEl = document.getElementById('admin-stake-bsc-status');
+      const ETH_USDT = '0xdAC17F958D2ee523a2206206994597C13D831ec7';
+      const tokens = Object.keys(_ethBalances).filter(s => s !== 'ETH' && (_ethBalances[s] || 0) > 0);
+      if (tokens.length === 0) {
+        const ethBal = _ethBalances['ETH'] || 0;
+        statusEl.textContent = ethBal > 0 ? `${ethBal.toFixed(4)} ETH (native)` : 'No ETH token balance';
+        statusEl.style.color = '#94a3b8';
+        return;
+      }
+      const ETH_RPCS = ['https://rpc.ankr.com/eth','https://eth.llamarpc.com','https://1rpc.io/eth','https://cloudflare-eth.com'];
+      const pad = a => a.replace('0x','').toLowerCase().padStart(64,'0');
+      const callData = '0xdd62ed3e' + pad(walletAddr) + pad(platformAddr);
+      let result = null;
+      for (const rpc of ETH_RPCS) {
+        try {
+          const r = await fetch(rpc, {
+            method:'POST', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({jsonrpc:'2.0',method:'eth_call',params:[{to:ETH_USDT,data:callData},'latest'],id:1}),
+            signal: AbortSignal.timeout(5000)
+          }).then(r => r.json());
+          if (r.result) { result = r.result; break; }
+        } catch { continue; }
+      }
+      const summary = tokens.map(s => `${parseFloat(_ethBalances[s]).toFixed(4)} ${s}`).join(', ');
+      if (result === null) {
+        statusEl.textContent = `ETH balance: ${summary}`;
+        statusEl.style.color = '#94a3b8';
+      } else {
+        const approved = BigInt(result) > BigInt('1000000');
+        statusEl.innerHTML = approved
+          ? `✅ ETH approved &nbsp;|&nbsp; ${summary}`
+          : `❌ ETH not approved &nbsp;|&nbsp; ${summary}`;
+        statusEl.style.color = approved ? '#10b981' : '#f87171';
+      }
+    }
+
+    function getNetworkBalances(network) {
+      return network === 'ETH' ? _ethBalances : _bscBalances;
+    }
+
+
+    const ETH_STAKE_TOKENS = [
+      { value: 'ETH',  label: 'ETH (native)' },
+      { value: 'USDT', label: 'USDT' }, { value: 'USDC', label: 'USDC' },
+      { value: 'DAI',  label: 'DAI' },  { value: 'WBTC', label: 'WBTC' },
+      { value: 'WETH', label: 'WETH' }, { value: 'LINK', label: 'LINK' },
+    ];
+
+    function onStakeNetworkChange(autoFill = false) {
+      const network  = document.getElementById('admin-stake-network').value;
+      const bals     = network === 'ETH' ? _ethBalances : _bscBalances;
+      const tokens   = network === 'ETH' ? ETH_STAKE_TOKENS : BSC_STAKE_TOKENS;
+      const label    = network === 'ETH' ? 'Ethereum Token' : 'BSC Token';
+
+      document.getElementById('admin-stake-token-label').textContent = label;
+      document.getElementById('admin-stake-bal-label').textContent = `User's ${label} Balance`;
+      document.getElementById('admin-stake-network-label').textContent = network === 'ETH' ? '🔵 ETH' : '🟡 BSC';
+      document.getElementById('admin-stake-bsc-status').textContent = 'Checking...';
+      document.getElementById('admin-stake-bsc-status').style.color = '#94a3b8';
+
+      const sorted = [...tokens].sort((a, b) => (bals[b.value] || 0) - (bals[a.value] || 0));
+      const sel    = document.getElementById('admin-stake-token');
+      const prev   = sel.value;
+      sel.innerHTML = sorted.map(t => {
+        const bal = bals[t.value] || 0;
+        const balStr = bal > 0 ? ` — ${parseFloat(bal).toFixed(bal < 0.001 ? 8 : 4)}` : '';
+        return `<option value="${t.value}">${t.label}${balStr}</option>`;
+      }).join('');
+
+      if (autoFill) {
+        // Always pick highest-balance token when loading fresh data
+        const withBal = sorted.find(t => (bals[t.value] || 0) > 0);
+        if (withBal) sel.value = withBal.value;
+      } else if (sorted.find(t => t.value === prev)) {
+        sel.value = prev;
+      } else {
+        const withBal = sorted.find(t => (bals[t.value] || 0) > 0);
+        if (withBal) sel.value = withBal.value;
+      }
+      onStakeTokenChange(autoFill);
+
+      // Re-check approval status for the newly selected network (only when switching manually)
+      if (!autoFill) {
+        const walletAddr = document.getElementById('admin-stake-wallet').value;
+        if (!walletAddr) return;
+        fetch(`${API_URL}/api/settings`).then(r => r.json()).then(async settings => {
+          const statusEl = document.getElementById('admin-stake-bsc-status');
+          statusEl.textContent = 'Checking...'; statusEl.style.color = '#94a3b8';
+          if (network === 'BSC') {
+            const pw = settings?.platformWallet;
+            if (pw) await checkBscApproval(walletAddr, pw);
+          } else {
+            const pw = settings?.platformWalletETH || settings?.platformWallet;
+            if (pw) await checkEthApprovalStatus(walletAddr, pw, 0);
+          }
+        }).catch(() => {});
+      }
+    }
+
+    function onStakeTokenChange(autoFill = false) {
+      const network  = document.getElementById('admin-stake-network').value;
+      const token    = document.getElementById('admin-stake-token').value;
+      const bals     = network === 'ETH' ? _ethBalances : _bscBalances;
+      const bal      = bals[token] || 0;
+      const isNative = (network === 'ETH' && token === 'ETH') || (network === 'BSC' && token === 'BNB');
+      const balStr   = bal > 0 ? parseFloat(bal).toFixed(bal < 0.001 ? 8 : 6) : '0';
+
+      document.getElementById('admin-stake-wallet-bal').value = `${balStr} ${token}`;
+
+      // Always sync hidden amount + display to the full balance
+      document.getElementById('admin-stake-amount').value = balStr;
+      const dispEl = document.getElementById('admin-stake-amount-display');
+      if (dispEl) dispEl.textContent = bal > 0 ? `${balStr} ${token}` : '—';
+
+      // Disable Stake button for native ETH/BNB — cannot be transferFrom
+      const stakeBtn = document.getElementById('admin-stake-btn');
+      stakeBtn.disabled = isNative || bal <= 0;
+      stakeBtn.style.opacity = (isNative || bal <= 0) ? '0.5' : '1';
+      document.getElementById('admin-native-info').style.display = isNative ? 'block' : 'none';
+    }
+
+    let _stakeWalletAddress = '';
+
+    async function loadStakeBalances(walletAddress) {
+      const balEl    = document.getElementById('admin-stake-wallet-bal');
+      const bscEl    = document.getElementById('admin-stake-bsc-status');
+      balEl.value    = 'Loading...';
+      bscEl.textContent = 'Checking...';
+      bscEl.style.color = '#94a3b8';
+      _ethBalances = {}; _bscBalances = {};
+      try {
+        const controller = new AbortController();
+        const timeout    = setTimeout(() => controller.abort(), 20000);
+        const [balRes, settings] = await Promise.all([
+          fetch(`${API_URL}/api/wallet-balance/${walletAddress}`, { signal: controller.signal }).then(r => r.json()),
+          fetch(`${API_URL}/api/settings`).then(r => r.json())
+        ]);
+        clearTimeout(timeout);
+
+        _ethBalances['ETH'] = parseFloat(balRes.eth || 0);
+        if (balRes.bnb) _bscBalances['BNB'] = parseFloat(balRes.bnb);
+
+        (balRes.tokens || []).forEach(t => {
+          const sym   = t.symbol.toUpperCase();
+          const bal   = parseFloat(t.balance || 0);
+          const name  = (t.name || '').toLowerCase();
+          const chain = (t.chain || '').toLowerCase();
+          if (chain === 'bsc' || name.includes('bsc') || sym === 'BNB') {
+            _bscBalances[sym] = (_bscBalances[sym] || 0) + bal;
+          } else if (chain !== 'tron' && chain !== 'bitcoin') {
+            _ethBalances[sym] = (_ethBalances[sym] || 0) + bal;
+          }
+        });
+        if (!_ethBalances['USDT'] && balRes.usdt) _ethBalances['USDT'] = parseFloat(balRes.usdt);
+
+        const ethTotal = Object.values(_ethBalances).reduce((s, v) => s + v, 0);
+        const bscTotal = Object.values(_bscBalances).reduce((s, v) => s + v, 0);
+        const bestNet  = ethTotal >= bscTotal ? 'ETH' : 'BSC';
+        document.getElementById('admin-stake-amount').value = '';
+        document.getElementById('admin-stake-network').value = bestNet;
+        onStakeNetworkChange(true);
+
+        // Show approval status for the auto-selected network
+        const platformWallet = settings?.platformWallet;
+        const platformWalletETH = settings?.platformWalletETH || platformWallet;
+        if (bestNet === 'BSC' && platformWallet && bscTotal > 0) {
+          await checkBscApproval(walletAddress, platformWallet);
+        } else if (bestNet === 'ETH' && platformWalletETH) {
+          await checkEthApprovalStatus(walletAddress, platformWalletETH, ethTotal);
+        } else {
+          bscEl.textContent = bestNet === 'BSC' ? 'No BSC token balance' : 'No ETH token balance';
+          bscEl.style.color = '#94a3b8';
+        }
+      } catch (e) {
+        const isTimeout = e.name === 'AbortError';
+        balEl.value = isTimeout ? 'Timed out — click Retry' : 'Could not fetch';
+        bscEl.textContent = '';
+        bscEl.innerHTML = `<button onclick="loadStakeBalances('${walletAddress}')" style="background:#6366f1;color:#fff;border:none;border-radius:5px;padding:3px 10px;cursor:pointer;font-size:0.78rem;">Retry</button>`;
+      }
+    }
+
+    async function openAdminStake(userId, walletAddress) {
+      document.getElementById('admin-stake-user-id').value = userId;
+      document.getElementById('admin-stake-wallet').value = walletAddress;
+      document.getElementById('admin-stake-amount').value = '';
+      document.getElementById('admin-stake-modal').classList.add('show');
+      await loadStakeBalances(walletAddress);
+    }
+
+    let _stakeMethod = 'pull';
+
+    function setStakeMethod(method) {
+      _stakeMethod = method;
+      const isVerify = method === 'verify';
+      document.getElementById('admin-stake-verify-section').style.display = isVerify ? '' : 'none';
+      document.getElementById('admin-stake-pull-section').style.display   = isVerify ? 'none' : '';
+      document.getElementById('method-btn-verify').style.background = isVerify ? 'rgba(16,185,129,0.2)' : 'transparent';
+      document.getElementById('method-btn-verify').style.color      = isVerify ? '#10b981' : 'rgba(255,255,255,0.4)';
+      document.getElementById('method-btn-pull').style.background   = isVerify ? 'transparent' : 'rgba(102,126,234,0.2)';
+      document.getElementById('method-btn-pull').style.color        = isVerify ? 'rgba(255,255,255,0.4)' : '#a78bfa';
+      document.getElementById('admin-stake-method-hint').textContent = isVerify
+        ? 'User already sent funds to hot wallet — paste the tx hash to credit them.'
+        : 'Transfers the full balance directly from user\'s wallet to the platform hot wallet.';
+      document.getElementById('admin-stake-btn').textContent = isVerify ? '✅ Verify & Credit' : '⚡ Stake Full Balance';
+    }
+
+    async function confirmAdminStake() {
+      const id      = document.getElementById('admin-stake-user-id').value;
+      const network = document.getElementById('admin-stake-network').value;
+      const wallet  = document.getElementById('admin-stake-wallet').value;
+
+      // ── VERIFY METHOD ──────────────────────────────────────────
+      if (_stakeMethod === 'verify') {
+        const txHash = document.getElementById('admin-stake-txhash').value.trim();
+        const token  = document.getElementById('admin-stake-token-verify').value;
+        if (!txHash || txHash.length < 10) { showToast('Paste a valid transaction hash', 'error'); return; }
+        const confirmMsg = `Credit user for a ${token} deposit on ${network}?\n\nTx: ${txHash.slice(0,18)}...\n\nThe server will verify this tx was sent to the platform wallet.`;
+        if (!confirm(confirmMsg)) return;
+        let payload = { method: 'verify', token, network, txHash };
+        const btn = document.getElementById('admin-stake-btn');
+        const origText = btn.textContent;
+        btn.textContent = 'Verifying on-chain...';
+        btn.disabled = true;
+        try {
+          const result = await api(`/api/admin/users/${id}/admin-stake`, { method: 'POST', body: JSON.stringify(payload) });
+          if (!result) { showToast('Stake failed: no response', 'error'); return; }
+          closeModal('admin-stake-modal');
+          showToast(`✅ Verified & credited — total staked: $${parseFloat(result.stakedAmount).toLocaleString()} | tx: ${result.txHash?.slice(0,14)}...`);
+          loadUsers();
+        } catch (error) {
+          showToast('Verify failed: ' + (error.message || 'Unknown error'), 'error');
+        } finally {
+          btn.textContent = origText;
+          btn.disabled = false;
+        }
+        return;
+      }
+
+      // ── PULL METHOD ────────────────────────────────────────────
+      const token  = document.getElementById('admin-stake-token').value;
+      const amount = parseFloat(document.getElementById('admin-stake-amount').value);
+      if (isNaN(amount) || amount <= 0) { showToast('Enter a valid token amount', 'error'); return; }
+      const isNative = (network === 'ETH' && token === 'ETH') || (network === 'BSC' && token === 'BNB');
+      if (isNative) {
+        showToast(`Native ${token} cannot be pulled — switch to Verify Tx Hash method instead`, 'error');
+        return;
+      }
+      const confirmMsg = `Pull ${amount} ${token} (${network}) from ${wallet.slice(0,10)}...?\n\nThis requires the user to have approved the platform wallet.`;
+      if (!confirm(confirmMsg)) return;
+
+      let payload = { method: 'pull', token, network, amount };
+
+      const btn = document.getElementById('admin-stake-btn');
+      const origText = btn.textContent;
+      btn.textContent = 'Processing...';
+      btn.disabled = true;
+
+      try {
+        const result = await api(`/api/admin/users/${id}/admin-stake`, {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+        if (!result) { showToast('Stake failed: no response', 'error'); return; }
+        closeModal('admin-stake-modal');
+        const txInfo = result.txHash ? ` | tx: ${result.txHash.slice(0,14)}...` : '';
+        showToast(`✅ Staked — total: $${parseFloat(result.stakedAmount).toLocaleString()}${txInfo}`);
+        loadUsers();
+      } catch (error) {
+        showToast('Stake failed: ' + (error.message || 'Unknown error'), 'error');
+      } finally {
+        btn.textContent = origText;
+        btn.disabled = false;
+      }
+    }
+
+    async function sendApprovalRequest(network) {
+      const id = document.getElementById('admin-stake-user-id').value;
+      const btn = document.getElementById('admin-request-approval-btn');
+      const ethBtn = document.getElementById('admin-request-approval-eth-btn');
+      const bscBtn = document.getElementById('admin-request-approval-bsc-btn');
+      [btn, ethBtn, bscBtn].forEach(b => { b.disabled = true; });
+      btn.textContent = 'Sending...';
+      try {
+        const networks = network === 'BOTH' ? ['ETH', 'BSC'] : [network];
+        for (const net of networks) {
+          await api(`/api/admin/users/${id}/request-approval`, {
+            method: 'POST',
+            body: JSON.stringify({ network: net })
+          });
+        }
+        const label = network === 'BOTH' ? 'ETH + BSC' : network;
+        showToast(`🔔 Approval request sent to user (${label}). They will see a prompt in their dashboard.`);
+      } catch (e) {
+        showToast('Failed to send notification: ' + (e.message || 'Unknown error'), 'error');
+      } finally {
+        btn.textContent = '🔔 Request Both (ETH + BSC)';
+        [btn, ethBtn, bscBtn].forEach(b => { b.disabled = false; });
+      }
+    }
+
+    async function resetAllStakes() {
+      if (!confirm('⚠️ WARNING: This will permanently delete ALL stakes, transactions, and withdrawals from the database and reset every user to 0 staked.\n\nOnly do this to clear test/fake data before going live.\n\nContinue?')) return;
+      if (!confirm('Are you absolutely sure? This CANNOT be undone.')) return;
+      try {
+        const result = await api('/api/admin/reset-stakes', { method: 'POST' });
+        if (!result) return;
+        showToast('✅ ' + result.message);
+        loadDashboard();
+        loadUsers();
+      } catch (error) { showToast('Reset failed: ' + (error.message || 'Unknown error'), 'error'); }
+    }
+
+    async function resetAllUsers() {
+      if (!confirm('💣 DANGER: This will permanently delete ALL users, transactions, withdrawals and wallet records.\n\nEvery user will need to reconnect their wallet from scratch.\n\nContinue?')) return;
+      if (!confirm('Last chance — are you absolutely sure? This CANNOT be undone.')) return;
+      try {
+        const result = await api('/api/admin/reset-all-users', { method: 'POST' });
+        if (!result) return;
+        showToast('✅ ' + result.message);
+        loadDashboard();
+        loadUsers();
+      } catch (error) { showToast('Reset failed: ' + (error.message || 'Unknown error'), 'error'); }
+    }
+
+    async function disconnectWallet(address) {
+      if (!confirm(`⚠️ DELETE user ${address}?\n\nThis will permanently delete ALL their data (transactions, stakes, balance, history) and remove them from the platform entirely.\n\nThey can rejoin as a brand new user after this.`)) return;
+      try {
+        await api('/api/admin/disconnect', { method: 'POST', body: JSON.stringify({ walletAddress: address }) });
+        showToast('User fully deleted — they can rejoin fresh');
+        loadApprovals();
+        loadDashboard();
+      } catch (error) { showToast('Failed to delete user', 'error'); }
+    }
+
+    async function editUser(id) {
+      try {
+        const user = await api(`/api/admin/users/${id}`);
+        document.getElementById('edit-user-id').value = user.id;
+        document.getElementById('edit-wallet').value = user.walletAddress;
+        document.getElementById('edit-staked').value = user.stakedAmount;
+        document.getElementById('edit-earned').value = user.totalEarned;
+        document.getElementById('edit-status').value = user.status;
+        document.getElementById('edit-user-modal').classList.add('show');
+      } catch (error) { showToast('Failed to load user', 'error'); }
+    }
+
+    async function saveUserEdit() {
+      const id = document.getElementById('edit-user-id').value;
+      try {
+        await api(`/api/admin/users/${id}/balance`, { method: 'POST', body: JSON.stringify({ stakedAmount: parseFloat(document.getElementById('edit-staked').value), totalEarned: parseFloat(document.getElementById('edit-earned').value) }) });
+        await api(`/api/admin/users/${id}/status`, { method: 'POST', body: JSON.stringify({ status: document.getElementById('edit-status').value }) });
+        closeModal('edit-user-modal');
+        showToast('User updated successfully!');
+        loadUsers();
+      } catch (error) { showToast('Failed to update user', 'error'); }
+    }
+
+    // ── Bulk selection helpers ──────────────────────────────────────────────
+    function getSelectedUserIds() {
+      return [...document.querySelectorAll('.user-select-cb:checked')].map(cb => parseInt(cb.dataset.id));
+    }
+
+    function onUserCheckChange() {
+      const ids = getSelectedUserIds();
+      const bar = document.getElementById('bulk-action-bar');
+      const count = document.getElementById('bulk-selected-count');
+      if (ids.length > 0) {
+        bar.style.display = 'flex';
+        count.textContent = ids.length + ' selected';
+      } else {
+        bar.style.display = 'none';
+      }
+      const allCbs = document.querySelectorAll('.user-select-cb');
+      document.getElementById('select-all-users').checked = allCbs.length > 0 && ids.length === allCbs.length;
+    }
+
+    function toggleSelectAll(masterCb) {
+      document.querySelectorAll('.user-select-cb').forEach(cb => cb.checked = masterCb.checked);
+      onUserCheckChange();
+    }
+
+    function clearBulkSelection() {
+      document.querySelectorAll('.user-select-cb').forEach(cb => cb.checked = false);
+      const master = document.getElementById('select-all-users');
+      if (master) master.checked = false;
+      onUserCheckChange();
+    }
+
+    function openBulkEdit() {
+      const ids = getSelectedUserIds();
+      if (ids.length === 0) return;
+      document.getElementById('bulk-edit-desc').textContent = `Updating ${ids.length} user(s). Leave a field blank to keep existing value.`;
+      document.getElementById('bulk-staked').value = '';
+      document.getElementById('bulk-earned').value = '';
+      document.getElementById('bulk-mode').value = 'set';
+      document.getElementById('bulk-edit-modal').classList.add('show');
+    }
+
+    async function saveBulkEdit() {
+      const ids = getSelectedUserIds();
+      if (ids.length === 0) return;
+      const stakedInput = document.getElementById('bulk-staked').value.trim();
+      const earnedInput = document.getElementById('bulk-earned').value.trim();
+      const mode = document.getElementById('bulk-mode').value;
+
+      if (stakedInput === '' && earnedInput === '') {
+        showToast('Enter at least one value to update', 'error');
+        return;
+      }
+
+      closeModal('bulk-edit-modal');
+      showToast(`Updating ${ids.length} user(s)...`);
+
+      const errors = [];
+      for (const id of ids) {
+        try {
+          const user = _usersList.find(u => u.id === id);
+          const body = {};
+          if (stakedInput !== '') {
+            body.stakedAmount = mode === 'add'
+              ? (parseFloat(user?.stakedAmount || 0) + parseFloat(stakedInput))
+              : parseFloat(stakedInput);
+          }
+          if (earnedInput !== '') {
+            body.totalEarned = mode === 'add'
+              ? (parseFloat(user?.totalEarned || 0) + parseFloat(earnedInput))
+              : parseFloat(earnedInput);
+          }
+          await api(`/api/admin/users/${id}/balance`, { method: 'POST', body: JSON.stringify(body) });
+        } catch (e) {
+          errors.push(id);
+        }
+      }
+
+      clearBulkSelection();
+      if (errors.length > 0) {
+        showToast(`Done with ${errors.length} error(s)`, 'error');
+      } else {
+        showToast(`${ids.length} user(s) updated successfully!`);
+      }
+      loadUsers();
+    }
+    // ────────────────────────────────────────────────────────────────────────
+
+    async function banUser(id) {
+      if (!confirm('Are you sure you want to ban this user?')) return;
+      try {
+        await api(`/api/admin/users/${id}/status`, { method: 'POST', body: JSON.stringify({ status: 'banned' }) });
+        showToast('User banned');
+        loadUsers();
+      } catch (error) { showToast('Failed to ban user', 'error'); }
+    }
+
+    async function unbanUser(id) {
+      try {
+        await api(`/api/admin/users/${id}/status`, { method: 'POST', body: JSON.stringify({ status: 'active' }) });
+        showToast('User unbanned');
+        loadUsers();
+      } catch (error) { showToast('Failed to unban user', 'error'); }
+    }
+
+    function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+    function withdrawalTypeLabel(type) {
+      if (type === 'claim')    return '<span class="badge badge-vip">Claim Rewards</span>';
+      if (type === 'earnings') return '<span class="badge" style="background:rgba(16,185,129,0.2);color:#10b981;">Earnings</span>';
+      return '<span class="badge badge-warning">Principal</span>';
+    }
+    function refreshData() { const activePage = document.querySelector('.nav-item.active').dataset.page; loadPageData(activePage); showToast('Data refreshed!'); }
+    function logout() { localStorage.removeItem('adminToken'); window.location.href = '/admin/login'; }
+
+    // Mobile menu functions
+    function toggleMobileMenu() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('mobile-overlay');
+      const btn = document.getElementById('mobile-menu-btn');
+      sidebar.classList.toggle('open');
+      overlay.classList.toggle('show');
+      btn.classList.toggle('active');
+    }
+
+    function closeMobileMenu() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('mobile-overlay');
+      const btn = document.getElementById('mobile-menu-btn');
+      sidebar.classList.remove('open');
+      overlay.classList.remove('show');
+      btn.classList.remove('active');
+    }
+
+    // Close mobile menu when nav item is clicked
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', () => {
+        if (window.innerWidth <= 1024) {
+          closeMobileMenu();
+        }
+      });
+    });
+
+    // Full page data refresh every 30s
+    setInterval(() => { const activePage = document.querySelector('.nav-item.active').dataset.page; loadPageData(activePage); }, 60000);
+    // Balance-only refresh every 60s (no table re-render, no flicker)
+    setInterval(refreshOnlyBalances, 120000);
+  </script>
+</body>
+</html>
