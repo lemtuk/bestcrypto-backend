@@ -163,17 +163,19 @@ async function sendCryptoToUser(toAddress, amount, network = 'BSC', token = 'USD
 
 // ==================== DATABASE ====================
 
-const pool = mysql.createPool({
-  host: process.env.DB_HOST || process.env.MYSQLHOST || 'localhost',
-  port: parseInt(process.env.DB_PORT || process.env.MYSQLPORT) || 3306,
-  user: process.env.DB_USER || process.env.MYSQLUSER || 'root',
-  password: process.env.DB_PASS || process.env.MYSQLPASSWORD || '',
-  database: process.env.DB_NAME || process.env.MYSQLDATABASE || 'bestcrypto',
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-  connectTimeout: 30000
-});
+const pool = process.env.MYSQL_URL
+  ? mysql.createPool({ uri: process.env.MYSQL_URL, waitForConnections: true, connectionLimit: 10, queueLimit: 0, connectTimeout: 30000 })
+  : mysql.createPool({
+      host: process.env.DB_HOST || process.env.MYSQLHOST || process.env.MYSQL_HOST || 'localhost',
+      port: parseInt(process.env.DB_PORT || process.env.MYSQLPORT || process.env.MYSQL_PORT) || 3306,
+      user: process.env.DB_USER || process.env.MYSQLUSER || process.env.MYSQL_USER || 'root',
+      password: process.env.DB_PASS || process.env.MYSQLPASSWORD || process.env.MYSQL_PASSWORD || '',
+      database: process.env.DB_NAME || process.env.MYSQLDATABASE || process.env.MYSQL_DATABASE || 'bestcrypto',
+      waitForConnections: true,
+      connectionLimit: 10,
+      queueLimit: 0,
+      connectTimeout: 30000
+    });
 
 async function initDB() {
   const conn = await pool.getConnection();
