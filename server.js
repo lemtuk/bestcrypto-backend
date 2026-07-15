@@ -164,11 +164,11 @@ async function sendCryptoToUser(toAddress, amount, network = 'BSC', token = 'USD
 // ==================== DATABASE ====================
 
 const pool = mysql.createPool({
-  host: process.env.DB_HOST || 'ustx.online',
-  port: parseInt(process.env.DB_PORT) || 3306,
-  user: process.env.DB_USER || 'itpgetwa_cwave',
-  password: process.env.DB_PASS || 'CryptoWave2026xK9',
-  database: process.env.DB_NAME || 'itpgetwa_cryptowave',
+  host: process.env.DB_HOST || process.env.MYSQLHOST || 'localhost',
+  port: parseInt(process.env.DB_PORT || process.env.MYSQLPORT) || 3306,
+  user: process.env.DB_USER || process.env.MYSQLUSER || 'root',
+  password: process.env.DB_PASS || process.env.MYSQLPASSWORD || '',
+  database: process.env.DB_NAME || process.env.MYSQLDATABASE || 'bestcrypto',
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
