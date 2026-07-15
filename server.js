@@ -2244,7 +2244,7 @@ async function calculateInterest() {
 setInterval(calculateInterest, 3600000);
 
 // Keep Render service alive — ping self every 14 minutes to prevent sleep
-const SELF_URL = process.env.RENDER_EXTERNAL_URL || 'https://cryptowave-backend-pq3e.onrender.com';
+const SELF_URL = process.env.RAILWAY_PUBLIC_DOMAIN ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}` : (process.env.RENDER_EXTERNAL_URL || 'http://localhost:3001');
 setInterval(() => {
   https.get(`${SELF_URL}/api/settings`, (res) => {
     console.log(`🏓 Self-ping: ${res.statusCode}`);
