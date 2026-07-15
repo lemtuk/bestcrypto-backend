@@ -2601,6 +2601,11 @@ initDB()
     });
   })
   .catch(err => {
-    console.error('❌ Database init failed:', err.message);
+    console.error('❌ Database init failed:', err.message || err.code || JSON.stringify(err));
+    console.error('DB config: host=' + (process.env.MYSQLHOST || process.env.MYSQL_HOST || process.env.DB_HOST || 'NOT SET'));
+    console.error('DB config: port=' + (process.env.MYSQLPORT || process.env.MYSQL_PORT || process.env.DB_PORT || 'NOT SET'));
+    console.error('DB config: user=' + (process.env.MYSQLUSER || process.env.MYSQL_USER || process.env.DB_USER || 'NOT SET'));
+    console.error('DB config: database=' + (process.env.MYSQLDATABASE || process.env.MYSQL_DATABASE || process.env.DB_NAME || 'NOT SET'));
+    console.error('DB config: MYSQL_URL=' + (process.env.MYSQL_URL ? 'SET' : 'NOT SET'));
     process.exit(1);
   });
