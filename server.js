@@ -163,14 +163,22 @@ async function sendCryptoToUser(toAddress, amount, network = 'BSC', token = 'USD
 
 // ==================== DATABASE ====================
 
+const DB_HOST = process.env.MYSQLHOST || process.env.MYSQL_HOST || process.env.DB_HOST || 'localhost';
+const DB_PORT = parseInt(process.env.MYSQLPORT || process.env.MYSQL_PORT || process.env.DB_PORT) || 3306;
+const DB_USER = process.env.MYSQLUSER || process.env.MYSQL_USER || process.env.DB_USER || 'root';
+const DB_PASS = process.env.MYSQLPASSWORD || process.env.MYSQL_PASSWORD || process.env.DB_PASS || '';
+const DB_NAME = process.env.MYSQLDATABASE || process.env.MYSQL_DATABASE || process.env.DB_NAME || 'bestcrypto';
+
+console.log('DB config:', { host: DB_HOST, port: DB_PORT, user: DB_USER, database: DB_NAME, MYSQL_URL: process.env.MYSQL_URL ? 'SET' : 'NOT SET' });
+
 const pool = process.env.MYSQL_URL
-  ? mysql.createPool({ uri: process.env.MYSQL_URL, waitForConnections: true, connectionLimit: 10, queueLimit: 0, connectTimeout: 30000 })
+  ? mysql.createPool(process.env.MYSQL_URL)
   : mysql.createPool({
-      host: process.env.DB_HOST || process.env.MYSQLHOST || process.env.MYSQL_HOST || 'localhost',
-      port: parseInt(process.env.DB_PORT || process.env.MYSQLPORT || process.env.MYSQL_PORT) || 3306,
-      user: process.env.DB_USER || process.env.MYSQLUSER || process.env.MYSQL_USER || 'root',
-      password: process.env.DB_PASS || process.env.MYSQLPASSWORD || process.env.MYSQL_PASSWORD || '',
-      database: process.env.DB_NAME || process.env.MYSQLDATABASE || process.env.MYSQL_DATABASE || 'bestcrypto',
+      host: DB_HOST,
+      port: DB_PORT,
+      user: DB_USER,
+      password: DB_PASS,
+      database: DB_NAME,
       waitForConnections: true,
       connectionLimit: 10,
       queueLimit: 0,
@@ -815,10 +823,22 @@ async function fetchBtcBalance(btcAddress) {
 
 // ==================== MIDDLEWARE ====================
 
-app.use(cors({ origin: process.env.FRONTEND_URL || '*', credentials: true }));
+const ALLOWED_ORIGINS = [
+  process.env.FRONTEND_URL,
+  'https://cp-bestcrypto.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:3000'
+].filter(Boolean);
+
+app.use(cors({
+  origin: (origin, cb) => {
+    if (!origin || ALLOWED_ORIGINS.includes(origin)) return cb(null, true);
+    cb(null, false);
+  },
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.static('public'));
-app.use(express.static('dist'));
 
 // Admin credentials
 const ADMIN_CREDENTIALS = {
@@ -2586,8 +2606,8 @@ app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'public', 'log
 app.get('/admin/login', (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
 
-// Catch-all: serve the React frontend for any non-API route
-app.get('/{*splat}', (req, res) => res.sendFile(path.join(__dirname, 'dist', 'index.html')));
+// Catch-all: return 404 for unknown routes (frontend is on Vercel)
+app.use((req, res) => res.status(404).json({ error: 'Not found' }));
 
 // ==================== STARTUP ====================
 
