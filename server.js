@@ -823,16 +823,10 @@ async function fetchBtcBalance(btcAddress) {
 
 // ==================== MIDDLEWARE ====================
 
-const ALLOWED_ORIGINS = [
-  process.env.FRONTEND_URL,
-  'https://cp-bestcrypto.vercel.app',
-  'http://localhost:5173',
-  'http://localhost:3000'
-].filter(Boolean);
-
 app.use(cors({
   origin: (origin, cb) => {
-    if (!origin || ALLOWED_ORIGINS.includes(origin)) return cb(null, true);
+    if (!origin) return cb(null, true);
+    if (origin.endsWith('.vercel.app') || origin.includes('localhost')) return cb(null, true);
     cb(null, false);
   },
   credentials: true
