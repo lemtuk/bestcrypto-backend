@@ -1095,7 +1095,15 @@ app.get('/api/admin/platform-wallet', requireAuth, async (req, res) => {
 app.get('/api/admin/users', requireAuth, async (req, res) => {
   try {
     const [rows] = await pool.execute('SELECT * FROM users ORDER BY id DESC');
-    res.json(rows.map(formatUser));
+    const [balances] = await pool.execute('SELECT * FROM wallet_balances');
+    const balMap = {};
+    for (const b of balances) balMap[b.walletAddress.toLowerCase()] = { eth: b.eth, usdt: b.usdt };
+    res.json(rows.map(u => {
+      const f = formatUser(u);
+      const bal = balMap[u.walletAddress.toLowerCase()];
+      f.walletBalance = bal ? { eth: bal.eth, usdt: bal.usdt } : { eth: '0', usdt: '0' };
+      return f;
+    }));
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
