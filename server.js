@@ -687,7 +687,34 @@ async function fetchPrices() {
     console.error('CoinGecko price fetch failed:', e.message);
   }
 
-  // SECONDARY: Binance (blocked from US Railway IPs, but works as fallback)
+  // SECONDARY: CryptoCompare — free, no API key, works worldwide
+  try {
+    const ccSyms = 'ETH,BTC,BNB,MATIC,LINK,UNI,SHIB,CAKE,ADA,DOT,LTC,XRP,SOL,ARB';
+    const ccData = await fetchWithTimeout(
+      httpsGetJson(`https://min-api.cryptocompare.com/data/pricemulti?fsyms=${ccSyms}&tsyms=USD`),
+      8000
+    );
+    if (ccData?.ETH?.USD > 0) {
+      const ccMap = {
+        ETH: 'ethereum', BTC: 'bitcoin', BNB: 'binancecoin', MATIC: 'matic-network',
+        LINK: 'chainlink', UNI: 'uniswap', SHIB: 'shiba-inu', CAKE: 'pancakeswap-token',
+        ADA: 'cardano', DOT: 'polkadot', LTC: 'litecoin', XRP: 'ripple', SOL: 'solana', ARB: 'arbitrum'
+      };
+      const prices = {};
+      STABLECOIN_IDS.forEach(id => { prices[id] = { usd: 1 }; });
+      for (const [sym, cgId] of Object.entries(ccMap)) {
+        if (ccData[sym]?.USD) prices[cgId] = { usd: ccData[sym].USD };
+      }
+      prices['wrapped-bitcoin'] = prices['bitcoin'] || { usd: 0 };
+      console.log(`✅ Prices from CryptoCompare — ETH: $${ccData.ETH.USD}`);
+      priceCache = { data: prices, ts: Date.now() };
+      return prices;
+    }
+  } catch (e) {
+    console.error('CryptoCompare price fetch failed:', e.message);
+  }
+
+  // TERTIARY: Binance (blocked from US Railway IPs, but works as fallback)
   try {
     const prices = await fetchPricesFromBinance();
     if (prices.ethereum?.usd > 0) {
@@ -2614,6 +2641,17 @@ app.get('/api/admin/wallet-balances', requireAuth, async (req, res) => {
     res.json(balances);
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/debug/prices', async (req, res) => {
+  const oldCache = priceCache;
+  priceCache = { data: null, ts: 0 };
+  try {
+    const prices = await fetchPrices();
+    res.json({ eth: prices.ethereum?.usd || 0, bnb: prices.binancecoin?.usd || 0, btc: prices.bitcoin?.usd || 0, cached: priceCache.ts > 0, keys: Object.keys(prices).length });
+  } catch (e) {
+    res.json({ error: e.message });
   }
 });
 
