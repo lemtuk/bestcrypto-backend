@@ -969,6 +969,7 @@
       try {
         const response = await fetch(`${API_URL}/api/admin/verify`, { headers: { 'Authorization': `Bearer ${token}` } });
         if (!response.ok) throw new Error('Unauthorized');
+        getClientPrices();
         loadDashboard();
         loadSendCrypto();
       } catch (error) {
@@ -1104,6 +1105,42 @@
 
     let walletBalances = {};
 
+    // Client-side price cache (fetched from browser, avoids US IP blocks on Railway)
+    let _clientPrices = null;
+    let _clientPricesTs = 0;
+    const PRICE_SYMBOLS = {ETH:'ethereum',BNB:'binancecoin',BTC:'bitcoin',WETH:'ethereum',MATIC:'matic-network',LINK:'chainlink',UNI:'uniswap',SHIB:'shiba-inu',CAKE:'pancakeswap-token',ADA:'cardano',DOT:'polkadot',LTC:'litecoin',XRP:'ripple',SOL:'solana',ARB:'arbitrum',BTCB:'bitcoin',WBTC:'bitcoin'};
+    const STABLES = ['USDT','USDC','BUSD','DAI','TUSD','FRAX'];
+    async function getClientPrices() {
+      if (_clientPrices && Date.now() - _clientPricesTs < 300000) return _clientPrices;
+      try {
+        const ids = [...new Set(Object.values(PRICE_SYMBOLS))].join(',');
+        const r = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd`);
+        _clientPrices = await r.json();
+        _clientPricesTs = Date.now();
+      } catch(e) { _clientPrices = _clientPrices || {}; }
+      return _clientPrices;
+    }
+    function enrichBalanceData(b) {
+      if (!_clientPrices) return b;
+      const ethPrice = _clientPrices.ethereum?.usd || 0;
+      const ethBal = parseFloat(b.eth || 0);
+      b.ethUsdPrice = ethPrice.toFixed(2);
+      b.ethUsdValue = (ethBal * ethPrice).toFixed(2);
+      let total = ethBal * ethPrice;
+      if (b.tokens) {
+        for (const t of b.tokens) {
+          const bal = parseFloat(t.balance || 0);
+          if (STABLES.includes(t.symbol)) { t.usdValue = bal.toFixed(2); t.price = '1.0000'; total += bal; continue; }
+          const cgId = PRICE_SYMBOLS[t.symbol];
+          const price = cgId && _clientPrices[cgId]?.usd || 0;
+          if (price > 0) { t.usdValue = (bal * price).toFixed(2); t.price = price.toFixed(4); }
+          total += parseFloat(t.usdValue || 0);
+        }
+      } else { total += parseFloat(b.usdt || 0); }
+      b.totalUsd = total.toFixed(2);
+      return b;
+    }
+
     // Track currently displayed wallets for targeted balance refreshes
     let _approvedUsers = [];
     let _pendingWallets = [];
@@ -1152,6 +1189,7 @@
 
     function applyBalanceToCell(el, b) {
       if (!el) return;
+      enrichBalanceData(b);
       const totalUsd = `$${fmtUsd(parseFloat(b.totalUsd || 0))}`;
       el.innerHTML = `<div style="font-weight:700;color:#10b981;">${totalUsd}</div>${renderTokenBreakdown(b)}`;
     }
