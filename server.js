@@ -2564,8 +2564,8 @@ app.get('/api/wallet-balance/:address', async (req, res) => {
       return tokens;
     }
 
-    // Fresh user-reported data (within 5 min)
-    if (reported && Date.now() - reported.updatedAt < 300000) {
+    // Fresh user-reported data (within 60s)
+    if (reported && Date.now() - reported.updatedAt < 60000) {
       const tokens = await augmentTokens(reported.tokensJson ? JSON.parse(reported.tokensJson) : []);
       const prices = await fetchPrices();
       const totalUsd = calcTotalUsd(reported.eth, reported.usdt, tokens, prices);
