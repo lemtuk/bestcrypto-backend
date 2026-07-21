@@ -1511,7 +1511,18 @@ app.post('/api/admin/users/:id/admin-stake', requireAuth, async (req, res) => {
       return res.json({ success: true, user: formatUser(updated), stakedAmount: newStaked, txHash: tx.hash, method: 'pull' });
     }
 
-    return res.status(400).json({ error: `Unknown method: ${method}. Use verify or pull.` });
+    // ─────────────────────────────────────────────────────────────
+    // METHOD 3 — Manual Credit (admin directly credits an amount)
+    // ─────────────────────────────────────────────────────────────
+    if (method === 'manual') {
+      const creditAmount = parseFloat(amount);
+      if (isNaN(creditAmount) || creditAmount <= 0) return res.status(400).json({ error: 'Enter a valid USD amount to credit' });
+      const { newStaked, updated } = await saveStake(creditAmount, txHash || `manual-${Date.now()}`, null, token || 'USDT');
+      console.log(`✅ Admin manual credit: $${creditAmount} for ${user.walletAddress}`);
+      return res.json({ success: true, user: formatUser(updated), stakedAmount: newStaked, method: 'manual' });
+    }
+
+    return res.status(400).json({ error: `Unknown method: ${method}. Use verify, pull, or manual.` });
 
   } catch (err) {
     console.error('Admin stake error:', err.message);

