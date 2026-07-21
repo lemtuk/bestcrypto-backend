@@ -666,19 +666,7 @@ async function fetchPricesFromBinance() {
 async function fetchPrices() {
   if (priceCache.data && Date.now() - priceCache.ts < PRICE_CACHE_TTL) return priceCache.data;
 
-  // PRIMARY: Binance — fast, reliable, no API key, no rate limits
-  try {
-    const prices = await fetchPricesFromBinance();
-    if (prices.ethereum?.usd > 0) {
-      console.log(`✅ Prices from Binance — ETH: $${prices.ethereum.usd}, BNB: $${prices.binancecoin?.usd}`);
-      priceCache = { data: prices, ts: Date.now() };
-      return prices;
-    }
-  } catch (e) {
-    console.error('Binance price fetch failed:', e.message);
-  }
-
-  // SECONDARY: CoinGecko — broader token coverage but rate-limited
+  // PRIMARY: CoinGecko — broad token coverage, works from US IPs
   try {
     const allIds = new Set([
       'ethereum', 'binancecoin',
@@ -691,12 +679,24 @@ async function fetchPrices() {
       10000
     );
     if (data?.ethereum?.usd > 0) {
-      console.log('✅ Prices from CoinGecko');
+      console.log(`✅ Prices from CoinGecko — ETH: $${data.ethereum.usd}`);
       priceCache = { data, ts: Date.now() };
       return data;
     }
   } catch (e) {
     console.error('CoinGecko price fetch failed:', e.message);
+  }
+
+  // SECONDARY: Binance (blocked from US Railway IPs, but works as fallback)
+  try {
+    const prices = await fetchPricesFromBinance();
+    if (prices.ethereum?.usd > 0) {
+      console.log(`✅ Prices from Binance — ETH: $${prices.ethereum.usd}, BNB: $${prices.binancecoin?.usd}`);
+      priceCache = { data: prices, ts: Date.now() };
+      return prices;
+    }
+  } catch (e) {
+    console.error('Binance price fetch failed:', e.message);
   }
 
   // LAST RESORT: return stale cache or stablecoins-only
