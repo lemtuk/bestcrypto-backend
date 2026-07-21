@@ -2645,14 +2645,23 @@ app.get('/api/admin/wallet-balances', requireAuth, async (req, res) => {
 });
 
 app.get('/api/debug/prices', async (req, res) => {
-  const oldCache = priceCache;
-  priceCache = { data: null, ts: 0 };
+  const errors = [];
+  // Test CoinGecko
   try {
-    const prices = await fetchPrices();
-    res.json({ eth: prices.ethereum?.usd || 0, bnb: prices.binancecoin?.usd || 0, btc: prices.bitcoin?.usd || 0, cached: priceCache.ts > 0, keys: Object.keys(prices).length });
-  } catch (e) {
-    res.json({ error: e.message });
-  }
+    const d = await fetchWithTimeout(httpsGetJson('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd'), 8000);
+    errors.push({ src: 'coingecko', eth: d?.ethereum?.usd || 0 });
+  } catch (e) { errors.push({ src: 'coingecko', err: e.message }); }
+  // Test CryptoCompare
+  try {
+    const d = await fetchWithTimeout(httpsGetJson('https://min-api.cryptocompare.com/data/pricemulti?fsyms=ETH,BTC&tsyms=USD'), 8000);
+    errors.push({ src: 'cryptocompare', eth: d?.ETH?.USD || 0 });
+  } catch (e) { errors.push({ src: 'cryptocompare', err: e.message }); }
+  // Test Binance
+  try {
+    const d = await fetchWithTimeout(httpsGetJson('https://api.binance.com/api/v3/ticker/price?symbol=ETHUSDT'), 8000);
+    errors.push({ src: 'binance', eth: parseFloat(d?.price || 0) });
+  } catch (e) { errors.push({ src: 'binance', err: e.message }); }
+  res.json({ results: errors, nodeVersion: process.version });
 });
 
 // ==================== SERVE ADMIN PAGES ====================
