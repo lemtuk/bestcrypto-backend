@@ -425,11 +425,11 @@ function formatUser(u) {
 // ==================== ETHEREUM ====================
 
 const ETH_RPC_URLS = [
-  'https://eth.llamarpc.com',
   'https://rpc.ankr.com/eth',
   'https://ethereum.publicnode.com',
   'https://1rpc.io/eth',
-  'https://cloudflare-eth.com'
+  'https://cloudflare-eth.com',
+  'https://eth.llamarpc.com'
 ];
 
 let provider;
@@ -446,6 +446,18 @@ function switchToNextProvider() {
 }
 
 createProvider();
+
+(async () => {
+  for (let i = 0; i < ETH_RPC_URLS.length; i++) {
+    try {
+      const testProvider = new ethers.providers.JsonRpcProvider(ETH_RPC_URLS[i]);
+      await Promise.race([testProvider.getBlockNumber(), new Promise((_, r) => setTimeout(() => r(new Error('timeout')), 4000))]);
+      if (i !== currentRpcIndex) { currentRpcIndex = i; createProvider(); }
+      console.log(`✅ ETH RPC healthy: ${ETH_RPC_URLS[i]}`);
+      break;
+    } catch (e) { console.log(`❌ ETH RPC down: ${ETH_RPC_URLS[i]}`); }
+  }
+})();
 
 // ==================== BSC (BNB Smart Chain) — used for admin stake ====================
 const BSC_RPC_URLS = [
@@ -698,12 +710,19 @@ async function fetchPrices() {
 async function fetchMultiTokenBalances(address, btcAddress = null) {
   const prices = await fetchPrices();
 
-  // ── Ethereum mainnet ──
+  // ── Ethereum mainnet (try multiple RPCs) ──
   let ethBal = 0;
-  try {
-    const raw = await fetchWithTimeout(provider.getBalance(address), 5000);
-    ethBal = parseFloat(ethers.utils.formatEther(raw));
-  } catch (e) { switchToNextProvider(); }
+  let workingProvider = provider;
+  for (let attempt = 0; attempt < ETH_RPC_URLS.length; attempt++) {
+    try {
+      const raw = await fetchWithTimeout(workingProvider.getBalance(address), 5000);
+      ethBal = parseFloat(ethers.utils.formatEther(raw));
+      break;
+    } catch (e) {
+      switchToNextProvider();
+      workingProvider = provider;
+    }
+  }
 
   const ethPrice = prices['ethereum']?.usd || 0;
   const ethUsd = ethBal * ethPrice;
@@ -712,7 +731,7 @@ async function fetchMultiTokenBalances(address, btcAddress = null) {
 
   for (const token of KNOWN_TOKENS) {
     try {
-      const contract = new ethers.Contract(token.address, ERC20_BALANCE_ABI, provider);
+      const contract = new ethers.Contract(token.address, ERC20_BALANCE_ABI, workingProvider);
       const raw = await fetchWithTimeout(contract.balanceOf(address), 5000);
       const bal = parseFloat(ethers.utils.formatUnits(raw, token.decimals));
       if (bal > 0) {
@@ -2588,12 +2607,8 @@ app.get('/api/admin/wallet-balances', requireAuth, async (req, res) => {
     for (const { walletAddress } of users) {
       if (!ethers.utils.isAddress(walletAddress)) { balances[walletAddress] = { eth: '0.00', usdt: '0.00' }; continue; }
       try {
-        const ethBalance = await provider.getBalance(walletAddress);
-        balances[walletAddress] = { eth: parseFloat(ethers.utils.formatEther(ethBalance)).toFixed(4), usdt: '0.00' };
-        const usdtContract = new ethers.Contract(USDT_ADDRESS, USDT_ABI, provider);
-        const usdtBalance = await usdtContract.balanceOf(walletAddress);
-        const decimals = await usdtContract.decimals();
-        balances[walletAddress].usdt = parseFloat(ethers.utils.formatUnits(usdtBalance, decimals)).toFixed(2);
+        const result = await fetchMultiTokenBalances(walletAddress);
+        balances[walletAddress] = { eth: result.eth || '0.00', usdt: result.usdt || '0.00' };
       } catch (e) { balances[walletAddress] = { eth: '0.00', usdt: '0.00' }; }
     }
     res.json(balances);
